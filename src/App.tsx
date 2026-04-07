@@ -1,0 +1,33 @@
+import { Routes, Route, Navigate } from 'react-router-dom'
+
+// Learner screens
+import HomePage        from '@/screens/HomePage'
+import LessonsPage     from '@/screens/LessonsPage'
+import LessonDetailPage from '@/screens/LessonDetailPage'
+import GlossaryPage    from '@/screens/GlossaryPage'
+import ModulesPage     from '@/screens/ModulesPage'
+import QuizPage        from '@/screens/QuizPage'
+
+// Creator screens
+import CreatorDashboard  from '@/screens/CreatorDashboard'
+import LessonGenerator   from '@/screens/LessonGenerator'
+
+export default function App() {
+  return (
+    <Routes>
+      {/* Learner */}
+      <Route path="/"                        element={<HomePage />} />
+      <Route path="/lessons"                 element={<LessonsPage />} />
+      <Route path="/lessons/:slug"           element={<LessonDetailPage />} />
+      <Route path="/glossary"                element={<GlossaryPage />} />
+      <Route path="/modules"                 element={<ModulesPage />} />
+      <Route path="/quiz/:lessonSlug"        element={<QuizPage />} />
+
+      {/* Creator */}
+      <Route path="/creator"                 element={<CreatorDashboard />} />
+      <Route path="/creator/generate"        element={<LessonGenerator />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}

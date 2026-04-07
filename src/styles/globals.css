@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* ── Brand ── */
+    --red:          #E8322A;   /* racing red — primary CTA */
+    --red-deep:     #B52820;
+    --red-muted:    rgba(232, 50, 42, 0.15);
+
+    --gold:         #C9A84C;   /* championship gold — achievement */
+    --gold-light:   rgba(201, 168, 76, 0.18);
+
+    /* ── Surfaces ── */
+    --bg:           #0D0D0D;   /* near-black base */
+    --surface:      #161616;   /* card background */
+    --surface-2:    #1E1E1E;   /* elevated surface */
+    --surface-3:    #262626;   /* hover/active state */
+
+    /* ── Text ── */
+    --text:         #F0EDE8;   /* off-white — primary */
+    --text-secondary: rgba(240, 237, 232, 0.55);
+    --text-tertiary:  rgba(240, 237, 232, 0.35);
+
+    /* ── Borders ── */
+    --border:       rgba(240, 237, 232, 0.08);
+    --border-strong: rgba(240, 237, 232, 0.14);
+
+    /* ── Difficulty ── */
+    --diff-beginner:    #3DAB6E;   /* green */
+    --diff-intermediate: #C9A84C;  /* gold */
+    --diff-advanced:    #E8322A;   /* red */
+
+    /* ── Pillars ── */
+    --pillar-racing:  #E8322A;
+    --pillar-car:     #4A9EDB;   /* steel blue */
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+}
+
+@layer components {
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .card-elevated {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  /* ── Pill badges ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .pill-racing {
+    background: var(--red-muted);
+    color: var(--red);
+    border: 1px solid rgba(232, 50, 42, 0.25);
+  }
+
+  .pill-car {
+    background: rgba(74, 158, 219, 0.15);
+    color: #4A9EDB;
+    border: 1px solid rgba(74, 158, 219, 0.25);
+  }
+
+  .pill-beginner {
+    background: rgba(61, 171, 110, 0.15);
+    color: var(--diff-beginner);
+    border: 1px solid rgba(61, 171, 110, 0.22);
+  }
+
+  .pill-intermediate {
+    background: var(--gold-light);
+    color: var(--gold);
+    border: 1px solid rgba(201, 168, 76, 0.25);
+  }
+
+  .pill-advanced {
+    background: var(--red-muted);
+    color: var(--red);
+    border: 1px solid rgba(232, 50, 42, 0.25);
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .btn-primary:hover  { background: var(--red-deep); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--text-tertiary);
+    color: var(--text);
+  }
+
+  /* ── Scrollbar ── */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ── Screen enter ── */
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-enter {
+    animation: screen-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+}
