@@ -4,8 +4,8 @@ import SearchPalette from './SearchPalette'
 
 const NAV_LINKS = [
   { to: '/lessons',  label: 'Lessons'  },
-  { to: '/glossary', label: 'Glossary' },
   { to: '/modules',  label: 'Modules'  },
+  { to: '/glossary', label: 'Glossary' },
   { to: '/tools',    label: 'Tools'    },
 ]
 
