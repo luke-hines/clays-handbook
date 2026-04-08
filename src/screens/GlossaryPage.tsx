@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { MOCK_CONCEPTS } from '@/lib/mockData'
 import PillBadge from '@/components/shared/PillBadge'
-import { Flag, Wrench, List, LayoutGrid, BookOpen, FlipHorizontal, Brain, Trophy, Flame, ThumbsUp, Search } from 'lucide-react'
+import { Flag, Wrench, List, LayoutGrid, BookOpen, FlipHorizontal, Brain, Trophy, Flame, ThumbsUp, Search, Library } from 'lucide-react'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { Pillar } from '@/types'
 
 type PageMode = 'browse' | 'study' | 'quiz'
@@ -550,6 +551,7 @@ function VocabQuiz({ pool }: { pool: ConceptType[] }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function GlossaryPage() {
+  const [loading, done] = usePageLoader(360)
   const [search, setSearch] = useState('')
   const [pillar, setPillar] = useState<Pillar | 'all'>('all')
   const [pageMode, setPageMode] = useState<PageMode>('browse')
@@ -596,6 +598,7 @@ export default function GlossaryPage() {
     </button>
   )
 
+  if (loading) return <PageLoader icon={<Library size={30} />} label="Glossary" color="#4A9EDB" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

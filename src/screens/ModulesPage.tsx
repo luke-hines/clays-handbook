@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom'
+import { LayoutGrid } from 'lucide-react'
 import { MOCK_MODULES, MOCK_LESSONS } from '@/lib/mockData'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import Icon from '@/components/shared/Icon'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
 export default function ModulesPage() {
+  const [loading, done] = usePageLoader(360)
+  if (loading) return <PageLoader icon={<LayoutGrid size={30} />} label="Modules" color="#C9A84C" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

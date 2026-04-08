@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom'
 import { MOCK_LESSONS } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
 import LessonCard from '@/components/learner/LessonCard'
-import { Flag, Wrench, Search } from 'lucide-react'
+import { Flag, Wrench, Search, BookOpen } from 'lucide-react'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { Pillar, Difficulty } from '@/types'
 
 const PILLARS: { value: Pillar | 'all'; label: string; icon?: React.ReactNode }[] = [
@@ -52,6 +53,7 @@ function FilterBtn({
 }
 
 export default function LessonsPage() {
+  const [loading, done] = usePageLoader(360)
   const [searchParams] = useSearchParams()
   const initialPillar = (searchParams.get('pillar') as Pillar | null) ?? 'all'
 
@@ -77,6 +79,7 @@ export default function LessonsPage() {
     })
   }, [pillar, difficulty, search, allLessons])
 
+  if (loading) return <PageLoader icon={<BookOpen size={30} />} label="Lessons" color="#E8322A" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

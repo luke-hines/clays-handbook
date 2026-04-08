@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAppStore } from '@/lib/store'
 import { generateDraft, type GenerateInput } from '@/lib/generate'
-import { Flag, Wrench } from 'lucide-react'
+import { Flag, Wrench, Wand2 } from 'lucide-react'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { Pillar, Difficulty, LessonCategory, LessonDraft } from '@/types'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
@@ -99,6 +100,7 @@ function CopyButton({ text }: { text: string }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function LessonGenerator() {
+  const [loading, done] = usePageLoader(360)
   const navigate = useNavigate()
   const addDraft = useAppStore(s => s.addDraft)
 
@@ -166,6 +168,7 @@ export default function LessonGenerator() {
   const accentColor = pillar === 'racing' ? 'var(--red)' : 'var(--pillar-car)'
   const accentHex = pillar === 'racing' ? '#E8322A' : '#4A9EDB'
 
+  if (loading) return <PageLoader icon={<Wand2 size={30} />} label="Lesson Generator" color="#C9A84C" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* ── Header ──────────────────────────────────────────────── */}

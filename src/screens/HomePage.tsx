@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom'
+import { Flag } from 'lucide-react'
 import { MOCK_LESSONS, MOCK_MODULES } from '@/lib/mockData'
 import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
 const featuredLessons = MOCK_LESSONS.filter(l => l.isFeatured)
 
 export default function HomePage() {
+  const [loading, done] = usePageLoader(380)
+  if (loading) return <PageLoader icon={<Flag size={30} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={380} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* ── Hero ─────────────────────────────────────────────────── */}

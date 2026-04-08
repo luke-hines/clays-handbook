@@ -8,6 +8,7 @@ import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import ConceptModal from '@/components/learner/ConceptModal'
 import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { Concept } from '@/types'
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -19,6 +20,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export default function LessonDetailPage() {
+  const [loading, done] = usePageLoader(400)
   const { slug } = useParams<{ slug: string }>()
   const [openConcept, setOpenConcept] = useState<Concept | null>(null)
   const videoUrls = useAppStore(s => s.videoUrls)
@@ -28,6 +30,17 @@ export default function LessonDetailPage() {
   const lesson = allLessons.find(l => l.slug === slug)
   if (!lesson) return <Navigate to="/lessons" replace />
 
+  const accentColor = lesson.pillar === 'racing' ? '#E8322A' : '#4A9EDB'
+  if (loading) return (
+    <PageLoader
+      icon={<Icon name={lesson.emoji} size={30} />}
+      label={lesson.title}
+      color={accentColor}
+      duration={400}
+      onDone={done}
+    />
+  )
+
   const concepts = MOCK_CONCEPTS.filter(c => lesson.conceptIds.includes(c.id))
   const quiz = MOCK_QUIZZES.find(q => q.lessonId === lesson.id)
   const relatedLessons = allLessons.filter(l => lesson.relatedLessonIds.includes(l.id))
@@ -35,7 +48,6 @@ export default function LessonDetailPage() {
   const rawVideoUrl = videoUrls[lesson.id] ?? lesson.videoUrl
   const embedUrl = rawVideoUrl ? parseVideoUrl(rawVideoUrl) : null
 
-  const accentColor = lesson.pillar === 'racing' ? 'var(--red)' : 'var(--pillar-car)'
 
   return (
     <>
@@ -222,8 +234,8 @@ export default function LessonDetailPage() {
                       width: 22,
                       height: 22,
                       borderRadius: 6,
-                      background: `${accentColor === 'var(--red)' ? '#E8322A' : '#4A9EDB'}18`,
-                      border: `1px solid ${accentColor === 'var(--red)' ? '#E8322A' : '#4A9EDB'}30`,
+                      background: `${accentColor}18`,
+                      border: `1px solid ${accentColor}30`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

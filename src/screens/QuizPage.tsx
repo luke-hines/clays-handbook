@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { MOCK_LESSONS, MOCK_QUIZZES } from '@/lib/mockData'
-import { Trophy, CheckCircle2, BookOpen } from 'lucide-react'
+import { Trophy, CheckCircle2, BookOpen, HelpCircle } from 'lucide-react'
+import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
+import Icon from '@/components/shared/Icon'
 
 type AnswerState = number | null
 
 export default function QuizPage() {
+  const [loading, done] = usePageLoader(380)
   const { lessonSlug } = useParams<{ lessonSlug: string }>()
 
   const lesson = MOCK_LESSONS.find(l => l.slug === lessonSlug)
@@ -18,6 +21,16 @@ export default function QuizPage() {
   const [finished, setFinished] = useState(false)
 
   if (!lesson || !quiz) return <Navigate to="/lessons" replace />
+
+  if (loading) return (
+    <PageLoader
+      icon={lesson ? <Icon name={lesson.emoji} size={30} /> : <HelpCircle size={30} />}
+      label={lesson ? `${lesson.title} — Quiz` : 'Quiz'}
+      color={lesson?.pillar === 'racing' ? '#E8322A' : '#4A9EDB'}
+      duration={380}
+      onDone={done}
+    />
+  )
 
   const question = quiz.questions[currentIndex]
   const totalQuestions = quiz.questions.length
