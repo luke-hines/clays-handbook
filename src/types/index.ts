@@ -136,8 +136,18 @@ export interface LessonDraft {
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 export interface AppState {
+  // Drafts
   drafts: LessonDraft[]
   addDraft: (draft: LessonDraft) => void
   updateDraft: (id: string, updates: Partial<LessonDraft>) => void
   deleteDraft: (id: string) => void
+
+  // Video URLs — lessonId → url (persisted, overrides static data)
+  videoUrls: Record<string, string>
+  setVideoUrl: (lessonId: string, url: string) => void
+  removeVideoUrl: (lessonId: string) => void
+
+  // Published lessons (created from drafts)
+  publishedLessons: Lesson[]
+  publishDraft: (draftId: string) => void
 }

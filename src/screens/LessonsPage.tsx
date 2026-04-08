@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { MOCK_LESSONS } from '@/lib/mockData'
+import { useAppStore } from '@/lib/store'
 import LessonCard from '@/components/learner/LessonCard'
 import type { Pillar, Difficulty } from '@/types'
 
@@ -56,9 +57,11 @@ export default function LessonsPage() {
   const [pillar, setPillar] = useState<Pillar | 'all'>(initialPillar)
   const [difficulty, setDifficulty] = useState<Difficulty | 'all'>('all')
   const [search, setSearch] = useState('')
+  const publishedLessons = useAppStore(s => s.publishedLessons)
+  const allLessons = useMemo(() => [...MOCK_LESSONS, ...publishedLessons], [publishedLessons])
 
   const filtered = useMemo(() => {
-    return MOCK_LESSONS.filter(l => {
+    return allLessons.filter(l => {
       if (pillar !== 'all' && l.pillar !== pillar) return false
       if (difficulty !== 'all' && l.difficulty !== difficulty) return false
       if (search) {
@@ -71,7 +74,7 @@ export default function LessonsPage() {
       }
       return true
     })
-  }, [pillar, difficulty, search])
+  }, [pillar, difficulty, search, allLessons])
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>

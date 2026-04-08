@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Lesson } from '@/types'
+import { useAppStore } from '@/lib/store'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 
@@ -25,6 +26,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export default function LessonCard({ lesson }: Props) {
+  const videoUrls = useAppStore(s => s.videoUrls)
+  const hasVideo = !!(videoUrls[lesson.id] ?? lesson.videoUrl)
+
   return (
     <Link
       to={`/lessons/${lesson.slug}`}
@@ -84,6 +88,24 @@ export default function LessonCard({ lesson }: Props) {
             }}
           >
             {lesson.emoji}
+          </span>
+          {/* Video status */}
+          <span
+            style={{
+              position: 'absolute',
+              top: 14,
+              left: 14,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              padding: '3px 8px',
+              borderRadius: 999,
+              background: hasVideo ? 'rgba(61,171,110,0.85)' : 'rgba(0,0,0,0.55)',
+              color: hasVideo ? '#fff' : 'rgba(255,255,255,0.55)',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            {hasVideo ? '▶ Video' : '⏳ Soon'}
           </span>
           {/* Pillar accent bar */}
           <div

@@ -73,46 +73,99 @@
     border-radius: 12px;
   }
 
-  /* ── Pill badges ── */
+  /* ── Pill badges — liquid glass ── */
   .pill {
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
     padding: 3px 10px;
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    position: relative;
   }
 
   .pill-racing {
-    background: var(--red-muted);
-    color: var(--red);
-    border: 1px solid rgba(232, 50, 42, 0.25);
+    background: linear-gradient(
+      160deg,
+      rgba(232, 50, 42, 0.22) 0%,
+      rgba(232, 50, 42, 0.10) 100%
+    );
+    color: #ff6b65;
+    border: 1px solid rgba(232, 50, 42, 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 0 10px rgba(232, 50, 42, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 0 8px rgba(232, 50, 42, 0.5);
   }
 
   .pill-car {
-    background: rgba(74, 158, 219, 0.15);
-    color: #4A9EDB;
-    border: 1px solid rgba(74, 158, 219, 0.25);
+    background: linear-gradient(
+      160deg,
+      rgba(74, 158, 219, 0.22) 0%,
+      rgba(74, 158, 219, 0.10) 100%
+    );
+    color: #72c3f5;
+    border: 1px solid rgba(74, 158, 219, 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 0 10px rgba(74, 158, 219, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 0 8px rgba(74, 158, 219, 0.5);
   }
 
   .pill-beginner {
-    background: rgba(61, 171, 110, 0.15);
-    color: var(--diff-beginner);
-    border: 1px solid rgba(61, 171, 110, 0.22);
+    background: linear-gradient(
+      160deg,
+      rgba(61, 171, 110, 0.22) 0%,
+      rgba(61, 171, 110, 0.10) 100%
+    );
+    color: #5dd68e;
+    border: 1px solid rgba(61, 171, 110, 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 0 10px rgba(61, 171, 110, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 0 8px rgba(61, 171, 110, 0.5);
   }
 
   .pill-intermediate {
-    background: var(--gold-light);
-    color: var(--gold);
-    border: 1px solid rgba(201, 168, 76, 0.25);
+    background: linear-gradient(
+      160deg,
+      rgba(201, 168, 76, 0.22) 0%,
+      rgba(201, 168, 76, 0.10) 100%
+    );
+    color: #e0c06a;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 0 10px rgba(201, 168, 76, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 0 8px rgba(201, 168, 76, 0.5);
   }
 
   .pill-advanced {
-    background: var(--red-muted);
-    color: var(--red);
-    border: 1px solid rgba(232, 50, 42, 0.25);
+    background: linear-gradient(
+      160deg,
+      rgba(232, 50, 42, 0.22) 0%,
+      rgba(232, 50, 42, 0.10) 100%
+    );
+    color: #ff6b65;
+    border: 1px solid rgba(232, 50, 42, 0.35);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+      0 0 10px rgba(232, 50, 42, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.25);
+    text-shadow: 0 0 8px rgba(232, 50, 42, 0.5);
   }
 
   /* ── Buttons ── */
@@ -152,6 +205,46 @@
   /* ── Scrollbar ── */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ── Flashcard flip ── */
+  .flashcard-scene {
+    perspective: 1200px;
+    width: 100%;
+  }
+
+  .flashcard-card {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .flashcard-card.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .flashcard-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    overflow: hidden;
+  }
+
+  .flashcard-back {
+    transform: rotateY(180deg);
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
 
   /* ── Screen enter ── */
   @keyframes screen-in {

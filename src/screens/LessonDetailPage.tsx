@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { MOCK_LESSONS, MOCK_CONCEPTS, MOCK_QUIZZES } from '@/lib/mockData'
+import { useAppStore } from '@/lib/store'
+import { parseVideoUrl } from '@/lib/videoUtils'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import ConceptModal from '@/components/learner/ConceptModal'
@@ -18,13 +20,19 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function LessonDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const [openConcept, setOpenConcept] = useState<Concept | null>(null)
+  const videoUrls = useAppStore(s => s.videoUrls)
+  const publishedLessons = useAppStore(s => s.publishedLessons)
 
-  const lesson = MOCK_LESSONS.find(l => l.slug === slug)
+  const allLessons = [...MOCK_LESSONS, ...publishedLessons]
+  const lesson = allLessons.find(l => l.slug === slug)
   if (!lesson) return <Navigate to="/lessons" replace />
 
   const concepts = MOCK_CONCEPTS.filter(c => lesson.conceptIds.includes(c.id))
   const quiz = MOCK_QUIZZES.find(q => q.lessonId === lesson.id)
-  const relatedLessons = MOCK_LESSONS.filter(l => lesson.relatedLessonIds.includes(l.id))
+  const relatedLessons = allLessons.filter(l => lesson.relatedLessonIds.includes(l.id))
+
+  const rawVideoUrl = videoUrls[lesson.id] ?? lesson.videoUrl
+  const embedUrl = rawVideoUrl ? parseVideoUrl(rawVideoUrl) : null
 
   const accentColor = lesson.pillar === 'racing' ? 'var(--red)' : 'var(--pillar-car)'
 
@@ -117,6 +125,58 @@ export default function LessonDetailPage() {
               {lesson.summary}
             </p>
           </div>
+
+          {/* ── Video ─────────────────────────────────────────── */}
+          {embedUrl ? (
+            <div
+              style={{
+                marginBottom: 32,
+                borderRadius: 12,
+                overflow: 'hidden',
+                border: '1px solid var(--border)',
+                position: 'relative',
+                paddingBottom: '56.25%', // 16:9
+                height: 0,
+                background: '#000',
+              }}
+            >
+              <iframe
+                src={embedUrl}
+                title={lesson.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  position: 'absolute',
+                  top: 0, left: 0,
+                  width: '100%', height: '100%',
+                  border: 'none',
+                }}
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                marginBottom: 32,
+                padding: '28px 24px',
+                borderRadius: 12,
+                background: 'var(--surface)',
+                border: '1px dashed var(--border-strong)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 16,
+              }}
+            >
+              <span style={{ fontSize: 32, flexShrink: 0 }}>🎬</span>
+              <div>
+                <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
+                  Video coming soon
+                </p>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--text-tertiary)' }}>
+                  The recording for this lesson hasn't been uploaded yet. Check back later.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* ── Key Takeaways ──────────────────────────────────── */}
           <div
