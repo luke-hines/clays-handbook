@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { Calculator, Flag, Timer } from 'lucide-react'
 import { TRACKS, CAR_CLASSES, CONDITIONS } from '@/lib/toolsData'
 import {
   calculateStrategy,
@@ -316,7 +317,7 @@ function StrategyCalculator() {
             textAlign: 'center',
             color: 'rgba(240,237,232,0.3)',
           }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🏁</div>
+            <div style={{ marginBottom: 12, color: 'rgba(240,237,232,0.2)', display: 'flex', justifyContent: 'center' }}><Flag size={40} /></div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>Configure your race and hit Calculate</div>
             <div style={{ fontSize: 12, marginTop: 6, opacity: 0.7 }}>Strategy variants will appear here</div>
           </div>
@@ -588,7 +589,7 @@ function LapAnalyzer() {
             textAlign: 'center',
             color: 'rgba(240,237,232,0.3)',
           }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>⏱️</div>
+            <div style={{ marginBottom: 12, color: 'rgba(240,237,232,0.2)', display: 'flex', justifyContent: 'center' }}><Timer size={40} /></div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>Enter your lap time and hit Analyze</div>
             <div style={{ fontSize: 12, marginTop: 6, opacity: 0.7 }}>Efficiency score and breakdown will appear here</div>
           </div>
@@ -717,7 +718,7 @@ export default function ToolsPage() {
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <span style={{ fontSize: 28 }}>🧮</span>
+          <span style={{ color: '#E8322A', filter: 'drop-shadow(0 0 8px rgba(232,50,42,0.4))', display: 'flex' }}><Calculator size={28} /></span>
           <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', color: 'var(--text)' }}>
             Racing{' '}
             <span style={{
@@ -746,9 +747,9 @@ export default function ToolsPage() {
         gap: 2,
       }}>
         {([
-          { id: 'strategy', label: 'Strategy Calculator', icon: '🏁' },
-          { id: 'analyzer', label: 'Lap Time Analyzer',   icon: '⏱️' },
-        ] as const).map(t => (
+          { id: 'strategy' as Tab, label: 'Strategy Calculator', icon: <Flag size={14} /> },
+          { id: 'analyzer' as Tab, label: 'Lap Time Analyzer',   icon: <Timer size={14} /> },
+        ]).map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MOCK_LESSONS, MOCK_CONCEPTS, MOCK_MODULES } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
+import Icon from '@/components/shared/Icon'
+
 import type { Lesson } from '@/types'
 
 interface SearchResult {
@@ -35,7 +37,7 @@ function buildIndex(publishedLessons: Lesson[]): SearchResult[] {
       type: 'concept',
       title: c.title,
       subtitle: c.summary,
-      emoji: c.pillar === 'racing' ? '🏁' : '🔧',
+      emoji: c.pillar === 'racing' ? 'Flag' : 'Wrench',
       url: `/glossary`,
     })
   }
@@ -245,7 +247,20 @@ export default function SearchPalette({ open, onClose }: Props) {
                   transition: 'background 0.1s',
                 }}
               >
-                <span style={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>{result.emoji}</span>
+                <span style={{
+                  flexShrink: 0,
+                  width: 32, height: 32,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  borderRadius: 8,
+                  background: result.type === 'lesson'  ? 'rgba(232,50,42,0.1)'  :
+                              result.type === 'module'  ? 'rgba(201,168,76,0.1)' :
+                                                          'rgba(74,158,219,0.1)',
+                  color:      result.type === 'lesson'  ? '#E8322A' :
+                              result.type === 'module'  ? '#C9A84C' :
+                                                          '#4A9EDB',
+                }}>
+                  <Icon name={result.emoji} size={16} />
+                </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{
                     margin: 0,

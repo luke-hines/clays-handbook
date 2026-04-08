@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { MOCK_CONCEPTS } from '@/lib/mockData'
 import PillBadge from '@/components/shared/PillBadge'
+import { Flag, Wrench, List, LayoutGrid, BookOpen, FlipHorizontal, Brain, Trophy, Flame, ThumbsUp, Search } from 'lucide-react'
 import type { Pillar } from '@/types'
 
 type PageMode = 'browse' | 'study' | 'quiz'
@@ -144,8 +145,8 @@ function ViewToggle({ view, onChange }: { view: ViewMode; onChange: (v: ViewMode
   return (
     <div style={{ display: 'flex', gap: 2, background: 'var(--surface-2)', borderRadius: 8, padding: 3, border: '1px solid var(--border)' }}>
       {([
-        { id: 'list' as ViewMode, icon: '☰', label: 'List' },
-        { id: 'grid' as ViewMode, icon: '⊞', label: 'Grid' },
+        { id: 'list' as ViewMode, icon: <List size={14} />, label: 'List' },
+        { id: 'grid' as ViewMode, icon: <LayoutGrid size={14} />, label: 'Grid' },
       ]).map(opt => (
         <button
           key={opt.id}
@@ -159,7 +160,7 @@ function ViewToggle({ view, onChange }: { view: ViewMode; onChange: (v: ViewMode
             boxShadow: view === opt.id ? '0 1px 3px rgba(0,0,0,0.3)' : 'none',
           }}
         >
-          <span style={{ fontSize: 14 }}>{opt.icon}</span>
+          {opt.icon}
           <span>{opt.label}</span>
         </button>
       ))}
@@ -440,8 +441,13 @@ function VocabQuiz({ pool }: { pool: ConceptType[] }) {
     const grade = pct === 100 ? 'Perfect' : pct >= 80 ? 'Strong' : pct >= 60 ? 'Decent' : 'Keep studying'
     return (
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '48px 0', textAlign: 'center' }}>
-        <div style={{ fontSize: 52, marginBottom: 16 }}>
-          {pct === 100 ? '🏆' : pct >= 80 ? '🔥' : pct >= 60 ? '👍' : '📚'}
+        <div style={{
+          width: 72, height: 72, borderRadius: '50%', margin: '0 auto 16px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: pct === 100 ? 'rgba(201,168,76,0.15)' : pct >= 80 ? 'rgba(232,50,42,0.15)' : pct >= 60 ? 'rgba(61,171,110,0.15)' : 'rgba(74,158,219,0.15)',
+          color: pct === 100 ? '#C9A84C' : pct >= 80 ? '#E8322A' : pct >= 60 ? '#3DAB6E' : '#4A9EDB',
+        }}>
+          {pct === 100 ? <Trophy size={32} /> : pct >= 80 ? <Flame size={32} /> : pct >= 60 ? <ThumbsUp size={32} /> : <BookOpen size={32} />}
         </div>
         <h2 style={{ margin: '0 0 8px', fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>
           {score} / {questions.length}
@@ -573,7 +579,7 @@ export default function GlossaryPage() {
     })
   }, [])
 
-  const ModeTab = ({ id, label, icon }: { id: PageMode; label: string; icon: string }) => (
+  const ModeTab = ({ id, label, icon }: { id: PageMode; label: string; icon: React.ReactNode }) => (
     <button
       onClick={() => setPageMode(id)}
       style={{
@@ -585,7 +591,7 @@ export default function GlossaryPage() {
         boxShadow: pageMode === id ? '0 1px 4px rgba(0,0,0,0.3)' : 'none',
       }}
     >
-      <span style={{ fontSize: 15 }}>{icon}</span>
+      {icon}
       {label}
     </button>
   )
@@ -609,7 +615,7 @@ export default function GlossaryPage() {
           {pageMode === 'browse' && (
             <>
               <div style={{ position: 'relative', maxWidth: 400, marginBottom: 16 }}>
-                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', fontSize: 14, pointerEvents: 'none' }}>🔍</span>
+                <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', pointerEvents: 'none', display: 'flex' }}><Search size={14} /></span>
                 <input
                   type="text"
                   placeholder="Search concepts..."
@@ -620,14 +626,15 @@ export default function GlossaryPage() {
               </div>
               <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
                 {([
-                  { value: 'all' as const, label: 'All' },
-                  { value: 'racing' as const, label: '🏁 Racing' },
-                  { value: 'car' as const, label: '🔧 Car' },
+                  { value: 'all' as const, label: 'All', icon: null },
+                  { value: 'racing' as const, label: 'Racing', icon: <Flag size={11} /> },
+                  { value: 'car' as const, label: 'Car', icon: <Wrench size={11} /> },
                 ]).map(opt => (
                   <button
                     key={opt.value}
                     onClick={() => setPillar(opt.value)}
                     style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
                       padding: '5px 12px', borderRadius: 6, fontSize: 13, fontWeight: 500,
                       border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
                       borderColor: pillar === opt.value ? 'var(--text-tertiary)' : 'var(--border)',
@@ -635,7 +642,7 @@ export default function GlossaryPage() {
                       color: pillar === opt.value ? 'var(--text)' : 'var(--text-secondary)',
                     }}
                   >
-                    {opt.label}
+                    {opt.icon}{opt.label}
                   </button>
                 ))}
               </div>
@@ -646,14 +653,15 @@ export default function GlossaryPage() {
           {pageMode !== 'browse' && (
             <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
               {([
-                { value: 'all' as const, label: 'All' },
-                { value: 'racing' as const, label: '🏁 Racing' },
-                { value: 'car' as const, label: '🔧 Car' },
+                { value: 'all' as const, label: 'All', icon: null },
+                { value: 'racing' as const, label: 'Racing', icon: <Flag size={11} /> },
+                { value: 'car' as const, label: 'Car', icon: <Wrench size={11} /> },
               ]).map(opt => (
                 <button
                   key={opt.value}
                   onClick={() => setPillar(opt.value)}
                   style={{
+                    display: 'flex', alignItems: 'center', gap: 5,
                     padding: '5px 12px', borderRadius: 6, fontSize: 13, fontWeight: 500,
                     border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
                     borderColor: pillar === opt.value ? 'var(--text-tertiary)' : 'var(--border)',
@@ -661,7 +669,7 @@ export default function GlossaryPage() {
                     color: pillar === opt.value ? 'var(--text)' : 'var(--text-secondary)',
                   }}
                 >
-                  {opt.label}
+                  {opt.icon}{opt.label}
                 </button>
               ))}
             </div>
@@ -669,9 +677,9 @@ export default function GlossaryPage() {
 
           {/* Mode tabs */}
           <div style={{ display: 'flex', gap: 2, borderBottom: '1px solid var(--border)', marginBottom: -1 }}>
-            <ModeTab id="browse" icon="📖" label="Browse" />
-            <ModeTab id="study"  icon="🃏" label="Study"  />
-            <ModeTab id="quiz"   icon="🧠" label="Quiz"   />
+            <ModeTab id="browse" icon={<BookOpen size={15} />}      label="Browse" />
+            <ModeTab id="study"  icon={<FlipHorizontal size={15} />} label="Study"  />
+            <ModeTab id="quiz"   icon={<Brain size={15} />}          label="Quiz"   />
           </div>
         </div>
       </div>
@@ -689,7 +697,7 @@ export default function GlossaryPage() {
 
             {filtered.length === 0 ? (
               <div style={{ padding: '64px 0', textAlign: 'center', color: 'var(--text-tertiary)' }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>🔍</div>
+                <div style={{ fontSize: 36, marginBottom: 12, color: 'var(--text-tertiary)', display: 'flex', justifyContent: 'center' }}><Search size={36} /></div>
                 <p style={{ margin: 0, fontSize: 15, color: 'var(--text-secondary)' }}>No concepts match your search.</p>
               </div>
             ) : viewMode === 'list' ? (

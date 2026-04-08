@@ -3,12 +3,13 @@ import { useSearchParams } from 'react-router-dom'
 import { MOCK_LESSONS } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
 import LessonCard from '@/components/learner/LessonCard'
+import { Flag, Wrench, Search } from 'lucide-react'
 import type { Pillar, Difficulty } from '@/types'
 
-const PILLARS: { value: Pillar | 'all'; label: string }[] = [
+const PILLARS: { value: Pillar | 'all'; label: string; icon?: React.ReactNode }[] = [
   { value: 'all', label: 'All' },
-  { value: 'racing', label: '🏁 Racing' },
-  { value: 'car', label: '🔧 Car Knowledge' },
+  { value: 'racing', label: 'Racing', icon: <Flag size={12} /> },
+  { value: 'car', label: 'Car Knowledge', icon: <Wrench size={12} /> },
 ]
 
 const DIFFICULTIES: { value: Difficulty | 'all'; label: string }[] = [
@@ -96,8 +97,8 @@ export default function LessonsPage() {
 
           {/* Search */}
           <div style={{ position: 'relative', maxWidth: 360, marginBottom: 20 }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', fontSize: 14, pointerEvents: 'none' }}>
-              🔍
+            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', pointerEvents: 'none', display: 'flex' }}>
+              <Search size={14} />
             </span>
             <input
               type="text"
@@ -130,7 +131,9 @@ export default function LessonsPage() {
                   onClick={() => setPillar(p.value)}
                   color={p.value === 'racing' ? '#E8322A' : p.value === 'car' ? '#4A9EDB' : undefined}
                 >
-                  {p.label}
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    {p.icon}{p.label}
+                  </span>
                 </FilterBtn>
               ))}
             </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { MOCK_LESSONS, MOCK_QUIZZES } from '@/lib/mockData'
+import { Trophy, CheckCircle2, BookOpen } from 'lucide-react'
 
 type AnswerState = number | null
 
@@ -51,8 +52,14 @@ export default function QuizPage() {
     return (
       <div className="screen-enter" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
         <div style={{ maxWidth: 520, width: '100%', textAlign: 'center' }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>
-            {pct === 100 ? '🏆' : pct >= 66 ? '✅' : '📚'}
+          <div style={{
+            width: 80, height: 80, borderRadius: '50%', margin: '0 auto 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: pct === 100 ? 'rgba(201,168,76,0.15)' : pct >= 66 ? 'rgba(61,171,110,0.15)' : 'rgba(74,158,219,0.15)',
+            color: pct === 100 ? '#C9A84C' : pct >= 66 ? '#3DAB6E' : '#4A9EDB',
+            boxShadow: `0 0 24px ${pct === 100 ? 'rgba(201,168,76,0.2)' : pct >= 66 ? 'rgba(61,171,110,0.2)' : 'rgba(74,158,219,0.2)'}`,
+          }}>
+            {pct === 100 ? <Trophy size={36} /> : pct >= 66 ? <CheckCircle2 size={36} /> : <BookOpen size={36} />}
           </div>
 
           <h1 style={{ margin: '0 0 8px', fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>

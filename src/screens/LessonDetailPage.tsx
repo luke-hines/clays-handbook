@@ -7,6 +7,7 @@ import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import ConceptModal from '@/components/learner/ConceptModal'
 import LessonCard from '@/components/learner/LessonCard'
+import Icon from '@/components/shared/Icon'
 import type { Concept } from '@/types'
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -91,7 +92,19 @@ export default function LessonDetailPage() {
           {/* Title block */}
           <div style={{ marginTop: 20, marginBottom: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <span style={{ fontSize: 44 }}>{lesson.emoji}</span>
+              <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 56,
+                height: 56,
+                borderRadius: 14,
+                background: lesson.pillar === 'racing' ? 'rgba(232,50,42,0.12)' : 'rgba(74,158,219,0.12)',
+                border: `1px solid ${lesson.pillar === 'racing' ? 'rgba(232,50,42,0.25)' : 'rgba(74,158,219,0.25)'}`,
+                color: lesson.pillar === 'racing' ? '#E8322A' : '#4A9EDB',
+              }}>
+                <Icon name={lesson.emoji} size={26} />
+              </span>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
               <PillBadge pillar={lesson.pillar} />

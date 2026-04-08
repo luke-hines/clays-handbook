@@ -57,7 +57,7 @@ export const useAppStore = create<AppState>()(
           keyTakeaways: draft.generatedTakeaways ?? [],
           body: draft.generatedBody ?? '',
           thumbnailColor: draft.pillar === 'racing' ? '#1a0a0a' : '#0a101a',
-          emoji: draft.pillar === 'racing' ? '🏁' : '🔧',
+          emoji: draft.pillar === 'racing' ? 'Flag' : 'Wrench',
           conceptIds: [],
           diagramIds: [],
           relatedLessonIds: [],

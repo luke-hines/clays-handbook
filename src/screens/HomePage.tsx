@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { MOCK_LESSONS, MOCK_MODULES } from '@/lib/mockData'
 import LessonCard from '@/components/learner/LessonCard'
+import Icon from '@/components/shared/Icon'
 
 const featuredLessons = MOCK_LESSONS.filter(l => l.isFeatured)
 
@@ -213,10 +214,10 @@ export default function HomePage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: 22,
+                          color: mod.color,
                         }}
                       >
-                        {mod.emoji}
+                        <Icon name={mod.emoji} size={20} />
                       </div>
                       <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
                         {lessons.length} lessons

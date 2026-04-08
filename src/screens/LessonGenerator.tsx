@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAppStore } from '@/lib/store'
 import { generateDraft, type GenerateInput } from '@/lib/generate'
+import { Flag, Wrench } from 'lucide-react'
 import type { Pillar, Difficulty, LessonCategory, LessonDraft } from '@/types'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
@@ -234,8 +235,8 @@ export default function LessonGenerator() {
             </label>
             <div style={{ display: 'flex', gap: 10 }}>
               {([
-                { value: 'racing' as Pillar, label: '🏁 Racing' },
-                { value: 'car' as Pillar, label: '🔧 Car Knowledge' },
+                { value: 'racing' as Pillar, label: 'Racing',       icon: <Flag size={14} /> },
+                { value: 'car' as Pillar,    label: 'Car Knowledge', icon: <Wrench size={14} /> },
               ]).map(opt => (
                 <button
                   key={opt.value}
@@ -260,7 +261,9 @@ export default function LessonGenerator() {
                       : 'var(--text-secondary)',
                   }}
                 >
-                  {opt.label}
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                    {opt.icon}{opt.label}
+                  </span>
                 </button>
               ))}
             </div>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { MOCK_MODULES, MOCK_LESSONS } from '@/lib/mockData'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
+import Icon from '@/components/shared/Icon'
 
 export default function ModulesPage() {
   return (
@@ -53,11 +54,11 @@ export default function ModulesPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 26,
+                      color: mod.color,
                       flexShrink: 0,
                     }}
                   >
-                    {mod.emoji}
+                    <Icon name={mod.emoji} size={24} />
                   </div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
@@ -126,7 +127,9 @@ export default function ModulesPage() {
                           {idx + 1}
                         </span>
 
-                        <span style={{ fontSize: 20, flexShrink: 0 }}>{lesson.emoji}</span>
+                        <span style={{ flexShrink: 0, color: mod.color, opacity: 0.7 }}>
+                          <Icon name={lesson.emoji} size={16} />
+                        </span>
 
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2, flexWrap: 'wrap' }}>

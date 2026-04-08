@@ -3,6 +3,8 @@ import type { Lesson } from '@/types'
 import { useAppStore } from '@/lib/store'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
+import Icon from '@/components/shared/Icon'
+import { Play, Clock } from 'lucide-react'
 
 interface Props {
   lesson: Lesson
@@ -76,18 +78,17 @@ export default function LessonCard({ lesson }: Props) {
               background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
             }}
           />
-          {/* Emoji */}
+          {/* Icon */}
           <span
             style={{
               position: 'absolute',
               top: 14,
               right: 14,
-              fontSize: 28,
-              lineHeight: 1,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
+              color: lesson.pillar === 'racing' ? 'rgba(232,50,42,0.9)' : 'rgba(74,158,219,0.9)',
+              filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.6))',
             }}
           >
-            {lesson.emoji}
+            <Icon name={lesson.emoji} size={22} />
           </span>
           {/* Video status */}
           <span
@@ -105,7 +106,10 @@ export default function LessonCard({ lesson }: Props) {
               backdropFilter: 'blur(4px)',
             }}
           >
-            {hasVideo ? '▶ Video' : '⏳ Soon'}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {hasVideo ? <Play size={9} fill="currentColor" /> : <Clock size={9} />}
+              {hasVideo ? 'Video' : 'Soon'}
+            </span>
           </span>
           {/* Pillar accent bar */}
           <div
