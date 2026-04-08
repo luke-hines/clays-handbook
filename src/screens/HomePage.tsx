@@ -1,161 +1,216 @@
 import { Link } from 'react-router-dom'
-import { Flag } from 'lucide-react'
+import { Flag, ArrowRight } from 'lucide-react'
 import { MOCK_LESSONS, MOCK_MODULES } from '@/lib/mockData'
 import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
 const featuredLessons = MOCK_LESSONS.filter(l => l.isFeatured)
+const racingLessons   = MOCK_LESSONS.filter(l => l.pillar === 'racing')
+const carLessons      = MOCK_LESSONS.filter(l => l.pillar === 'car')
+
+const RACING_CATS = ['Racecraft', 'Braking', 'Cornering', 'Overtaking', 'Defense']
+const CAR_CATS    = ['Suspension', 'Brakes', 'Tires', 'Drivetrain', 'Engine']
 
 export default function HomePage() {
   const [loading, done] = usePageLoader(380)
   if (loading) return <PageLoader icon={<Flag size={30} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={380} onDone={done} />
+
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section
-        style={{
-          borderBottom: '1px solid var(--border)',
-          background: 'linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%)',
-          padding: '72px 24px 64px',
-        }}
-      >
-        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ marginBottom: 24 }}>
-            <span
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--red)',
-              }}
-            >
-              Racing · Car Knowledge
-            </span>
-          </div>
 
-          <h1
-            style={{
-              margin: '0 0 16px',
-              fontSize: 'clamp(36px, 6vw, 60px)',
-              fontWeight: 800,
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <section style={{
+        borderBottom: '1px solid var(--border)',
+        background: 'linear-gradient(160deg, #111 0%, #0D0D0D 60%, #0a0810 100%)',
+        padding: '56px 24px 52px',
+      }}>
+        <div style={{
+          maxWidth: 1120, margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: '1fr 380px',
+          gap: 48,
+          alignItems: 'center',
+        }}>
+
+          {/* Left: headline + CTAs */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+              <span style={{
+                fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+                textTransform: 'uppercase', color: '#E8322A',
+              }}>
+                Racing
+              </span>
+              <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--text-tertiary)' }} />
+              <span style={{
+                fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+                textTransform: 'uppercase', color: '#4A9EDB',
+              }}>
+                Car Knowledge
+              </span>
+            </div>
+
+            <h1 style={{
+              margin: '0 0 18px',
+              fontSize: 'clamp(34px, 4.5vw, 54px)',
+              fontWeight: 900,
               letterSpacing: '-0.04em',
-              lineHeight: 1.08,
+              lineHeight: 1.06,
               color: 'var(--text)',
-              maxWidth: 640,
-            }}
-          >
-            Drive smarter.
-            <br />
-            Know your car.
-          </h1>
+            }}>
+              Drive smarter.
+              <br />
+              <span style={{
+                background: 'linear-gradient(90deg, #E8322A 0%, #ff7a6b 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                Know your car.
+              </span>
+            </h1>
 
-          <p
-            style={{
-              margin: '0 0 40px',
-              fontSize: 17,
+            <p style={{
+              margin: '0 0 36px',
+              fontSize: 16,
               color: 'var(--text-secondary)',
-              lineHeight: 1.6,
-              maxWidth: 520,
-            }}
-          >
-            Racing technique and car knowledge — explained like experienced guys
-            talking in the paddock, not a generic course site.
-          </p>
+              lineHeight: 1.65,
+              maxWidth: 460,
+            }}>
+              Racing technique and car knowledge — explained the way experienced guys talk in the paddock. No fluff, no filler.
+            </p>
 
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Link to="/lessons" className="btn-primary" style={{ textDecoration: 'none', fontSize: 15 }}>
-              Browse Lessons
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <Link to="/lessons" className="btn-primary" style={{ textDecoration: 'none', fontSize: 14 }}>
+                Browse Lessons
+              </Link>
+              <Link to="/modules" className="btn-ghost" style={{ textDecoration: 'none', fontSize: 14 }}>
+                View Modules
+              </Link>
+            </div>
+          </div>
+
+          {/* Right: stat panel */}
+          <div style={{
+            borderRadius: 14,
+            border: '1px solid var(--border)',
+            background: 'rgba(255,255,255,0.025)',
+            backdropFilter: 'blur(12px)',
+            overflow: 'hidden',
+          }}>
+            {/* Total bar */}
+            <div style={{
+              padding: '16px 20px',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              gap: 20,
+            }}>
+              {[
+                { n: MOCK_LESSONS.length, label: 'Lessons' },
+                { n: MOCK_MODULES.length, label: 'Modules' },
+                { n: 2, label: 'Pillars' },
+              ].map(s => (
+                <div key={s.label}>
+                  <p style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--text)', lineHeight: 1 }}>
+                    {s.n}
+                  </p>
+                  <p style={{ margin: '3px 0 0', fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.04em' }}>
+                    {s.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Racing block */}
+            <Link to="/lessons?pillar=racing" style={{ textDecoration: 'none', display: 'block' }}>
+              <div
+                style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', cursor: 'pointer', transition: 'background 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(232,50,42,0.06)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>🏁</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Racing</span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '2px 7px',
+                      borderRadius: 999, background: 'rgba(232,50,42,0.12)',
+                      border: '1px solid rgba(232,50,42,0.25)', color: '#E8322A',
+                    }}>
+                      {racingLessons.length} lessons
+                    </span>
+                  </div>
+                  <ArrowRight size={13} color="var(--text-tertiary)" />
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {RACING_CATS.map(c => (
+                    <span key={c} style={{
+                      fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                      background: 'var(--surface)', border: '1px solid var(--border)',
+                      color: 'var(--text-tertiary)',
+                    }}>{c}</span>
+                  ))}
+                  <span style={{ fontSize: 11, color: 'var(--text-tertiary)', padding: '2px 0' }}>+1</span>
+                </div>
+              </div>
             </Link>
-            <Link to="/modules" className="btn-ghost" style={{ textDecoration: 'none', fontSize: 15 }}>
-              View Modules
+
+            {/* Car Knowledge block */}
+            <Link to="/lessons?pillar=car" style={{ textDecoration: 'none', display: 'block' }}>
+              <div
+                style={{ padding: '16px 20px', cursor: 'pointer', transition: 'background 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,158,219,0.06)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>🔧</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Car Knowledge</span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '2px 7px',
+                      borderRadius: 999, background: 'rgba(74,158,219,0.12)',
+                      border: '1px solid rgba(74,158,219,0.25)', color: '#4A9EDB',
+                    }}>
+                      {carLessons.length} lessons
+                    </span>
+                  </div>
+                  <ArrowRight size={13} color="var(--text-tertiary)" />
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {CAR_CATS.map(c => (
+                    <span key={c} style={{
+                      fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                      background: 'var(--surface)', border: '1px solid var(--border)',
+                      color: 'var(--text-tertiary)',
+                    }}>{c}</span>
+                  ))}
+                  <span style={{ fontSize: 11, color: 'var(--text-tertiary)', padding: '2px 0' }}>+3</span>
+                </div>
+              </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Pillar Cards ─────────────────────────────────────────── */}
-      <section style={{ padding: '48px 24px' }}>
+      {/* ── Featured Lessons ──────────────────────────────────────────────── */}
+      <section style={{ padding: '40px 24px 0' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-            <Link to="/lessons?pillar=racing" style={{ textDecoration: 'none' }}>
-              <div
-                className="card"
-                style={{
-                  padding: '28px 28px 24px',
-                  borderLeft: '3px solid var(--red)',
-                  transition: 'transform 0.15s',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-              >
-                <div style={{ fontSize: 32, marginBottom: 14 }}>🏁</div>
-                <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}>
-                  Racing
-                </h2>
-                <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  Sim-first racecraft: trail braking, overtaking, defense, and everything that separates a fast lap from a race win.
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-                    {MOCK_LESSONS.filter(l => l.pillar === 'racing').length} lessons
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--red)' }}>Explore →</span>
-                </div>
-              </div>
-            </Link>
-
-            <Link to="/lessons?pillar=car" style={{ textDecoration: 'none' }}>
-              <div
-                className="card"
-                style={{
-                  padding: '28px 28px 24px',
-                  borderLeft: '3px solid var(--pillar-car)',
-                  transition: 'transform 0.15s',
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-                onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-              >
-                <div style={{ fontSize: 32, marginBottom: 14 }}>🔧</div>
-                <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}>
-                  Car Knowledge
-                </h2>
-                <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  How suspension, brakes, differentials, and tires actually work — and what the settings actually change.
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-                    {MOCK_LESSONS.filter(l => l.pillar === 'car').length} lessons
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--pillar-car)' }}>Explore →</span>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Featured Lessons ─────────────────────────────────────── */}
-      <section style={{ padding: '0 24px 56px' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
-              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-                Featured
-              </p>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text)' }}>
+              <p style={{ margin: '0 0 3px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
                 Start Here
+              </p>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>
+                Featured Lessons
               </h2>
             </div>
-            <Link to="/lessons" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>
-              All lessons →
+            <Link to="/lessons" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+              All lessons <ArrowRight size={13} />
             </Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
             {featuredLessons.map(lesson => (
               <LessonCard key={lesson.id} lesson={lesson} />
             ))}
@@ -163,92 +218,69 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Modules ──────────────────────────────────────────────── */}
-      <section
-        style={{
-          padding: '48px 24px 64px',
-          borderTop: '1px solid var(--border)',
-          background: 'var(--surface)',
-        }}
-      >
+      {/* ── Modules ───────────────────────────────────────────────────────── */}
+      <section style={{ padding: '40px 24px 56px' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
-              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+              <p style={{ margin: '0 0 3px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
                 Structured Learning
               </p>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text)' }}>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>
                 Modules
               </h2>
             </div>
-            <Link to="/modules" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>
-              All modules →
+            <Link to="/modules" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+              All modules <ArrowRight size={13} />
             </Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: 12,
+          }}>
             {MOCK_MODULES.map(mod => {
-              const lessons = MOCK_LESSONS.filter(l => mod.lessonIds.includes(l.id))
+              const count = MOCK_LESSONS.filter(l => mod.lessonIds.includes(l.id)).length
               return (
                 <Link key={mod.id} to="/modules" style={{ textDecoration: 'none' }}>
                   <div
-                    className="card-elevated"
                     style={{
-                      padding: '24px',
-                      transition: 'transform 0.15s, border-color 0.15s',
+                      padding: '18px 20px',
+                      borderRadius: 10,
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface)',
                       cursor: 'pointer',
+                      transition: 'border-color 0.15s, transform 0.15s',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 14,
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.borderColor = 'var(--border-strong)'
+                      e.currentTarget.style.borderColor = mod.color + '60'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.transform = 'translateY(0)'
                       e.currentTarget.style.borderColor = 'var(--border)'
+                      e.currentTarget.style.transform = 'translateY(0)'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
-                      <div
-                        style={{
-                          width: 42,
-                          height: 42,
-                          borderRadius: 10,
-                          background: `${mod.color}20`,
-                          border: `1px solid ${mod.color}40`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: mod.color,
-                        }}
-                      >
-                        <Icon name={mod.emoji} size={20} />
-                      </div>
-                      <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-                        {lessons.length} lessons
-                      </span>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+                      background: `${mod.color}18`,
+                      border: `1px solid ${mod.color}35`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: mod.color,
+                    }}>
+                      <Icon name={mod.emoji} size={17} />
                     </div>
-                    <h3 style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}>
-                      {mod.title}
-                    </h3>
-                    <p style={{ margin: '0 0 16px', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                      {mod.description}
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {lessons.slice(0, 3).map(l => (
-                        <span
-                          key={l.id}
-                          style={{
-                            fontSize: 11,
-                            padding: '3px 8px',
-                            borderRadius: 4,
-                            background: 'var(--surface)',
-                            border: '1px solid var(--border)',
-                            color: 'var(--text-tertiary)',
-                          }}
-                        >
-                          {l.title}
-                        </span>
-                      ))}
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 700, color: 'var(--text)', lineHeight: 1.3, letterSpacing: '-0.01em' }}>
+                        {mod.title}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>
+                        {count} lessons
+                      </p>
                     </div>
                   </div>
                 </Link>
