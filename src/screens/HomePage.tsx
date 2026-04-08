@@ -101,10 +101,10 @@ export default function HomePage() {
           }}>
             {/* Total bar */}
             <div style={{
-              padding: '16px 20px',
+              padding: '22px 28px',
               borderBottom: '1px solid var(--border)',
               display: 'flex',
-              gap: 20,
+              gap: 32,
             }}>
               {[
                 { n: MOCK_LESSONS.length, label: 'Lessons' },
@@ -112,10 +112,10 @@ export default function HomePage() {
                 { n: 2, label: 'Pillars' },
               ].map(s => (
                 <div key={s.label}>
-                  <p style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--text)', lineHeight: 1 }}>
+                  <p style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--text)', lineHeight: 1 }}>
                     {s.n}
                   </p>
-                  <p style={{ margin: '3px 0 0', fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  <p style={{ margin: '5px 0 0', fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                     {s.label}
                   </p>
                 </div>
@@ -125,33 +125,32 @@ export default function HomePage() {
             {/* Racing block */}
             <Link to="/lessons?pillar=racing" style={{ textDecoration: 'none', display: 'block' }}>
               <div
-                style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', cursor: 'pointer', transition: 'background 0.15s' }}
+                style={{ padding: '22px 28px', borderBottom: '1px solid var(--border)', cursor: 'pointer', transition: 'background 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(232,50,42,0.06)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>🏁</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Racing</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 18 }}>🏁</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Racing</span>
                     <span style={{
-                      fontSize: 10, fontWeight: 700, padding: '2px 7px',
+                      fontSize: 11, fontWeight: 700, padding: '3px 9px',
                       borderRadius: 999, background: 'rgba(232,50,42,0.12)',
                       border: '1px solid rgba(232,50,42,0.25)', color: '#E8322A',
                     }}>
                       {racingLessons.length} lessons
                     </span>
                   </div>
-                  <ArrowRight size={13} color="var(--text-tertiary)" />
+                  <ArrowRight size={14} color="#E8322A" />
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                  {RACING_CATS.map(c => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {['Racecraft', 'Braking', 'Cornering', 'Overtaking', 'Defense', 'Sim Technique'].map(c => (
                     <span key={c} style={{
-                      fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                      fontSize: 11, padding: '4px 10px', borderRadius: 6,
                       background: 'var(--surface)', border: '1px solid var(--border)',
                       color: 'var(--text-tertiary)',
                     }}>{c}</span>
                   ))}
-                  <span style={{ fontSize: 11, color: 'var(--text-tertiary)', padding: '2px 0' }}>+1</span>
                 </div>
               </div>
             </Link>
@@ -159,33 +158,32 @@ export default function HomePage() {
             {/* Car Knowledge block */}
             <Link to="/lessons?pillar=car" style={{ textDecoration: 'none', display: 'block' }}>
               <div
-                style={{ padding: '16px 20px', cursor: 'pointer', transition: 'background 0.15s' }}
+                style={{ padding: '22px 28px', cursor: 'pointer', transition: 'background 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,158,219,0.06)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16 }}>🔧</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Car Knowledge</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 18 }}>🔧</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Car Knowledge</span>
                     <span style={{
-                      fontSize: 10, fontWeight: 700, padding: '2px 7px',
+                      fontSize: 11, fontWeight: 700, padding: '3px 9px',
                       borderRadius: 999, background: 'rgba(74,158,219,0.12)',
                       border: '1px solid rgba(74,158,219,0.25)', color: '#4A9EDB',
                     }}>
                       {carLessons.length} lessons
                     </span>
                   </div>
-                  <ArrowRight size={13} color="var(--text-tertiary)" />
+                  <ArrowRight size={14} color="#4A9EDB" />
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                  {CAR_CATS.map(c => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {['Suspension', 'Brakes', 'Tires', 'Drivetrain', 'Engine', 'Aerodynamics', 'Setup'].map(c => (
                     <span key={c} style={{
-                      fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                      fontSize: 11, padding: '4px 10px', borderRadius: 6,
                       background: 'var(--surface)', border: '1px solid var(--border)',
                       color: 'var(--text-tertiary)',
                     }}>{c}</span>
                   ))}
-                  <span style={{ fontSize: 11, color: 'var(--text-tertiary)', padding: '2px 0' }}>+3</span>
                 </div>
               </div>
             </Link>
