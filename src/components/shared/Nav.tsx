@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Flag } from 'lucide-react'
 import SearchPalette from './SearchPalette'
 
 const NAV_LINKS = [
@@ -75,7 +74,7 @@ export default function Nav() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.filter = 'drop-shadow(0 0 12px rgba(232,50,42,0.8))' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.filter = 'drop-shadow(0 0 6px rgba(232,50,42,0.5))' }}
             >
-              <Flag size={20} fill="#E8322A" />
+              🏁
             </span>
             <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: '-0.03em', color: 'var(--text)' }}>
               Clay's{' '}
