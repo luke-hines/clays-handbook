@@ -7,8 +7,10 @@ import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import ConceptModal from '@/components/learner/ConceptModal'
 import LessonCard from '@/components/learner/LessonCard'
+import TrackDiagramView from '@/components/learner/TrackDiagram'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
+import { getDiagram } from '@/lib/diagramData'
 import type { Concept } from '@/types'
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -44,6 +46,7 @@ export default function LessonDetailPage() {
   const concepts = MOCK_CONCEPTS.filter(c => lesson.conceptIds.includes(c.id))
   const quiz = MOCK_QUIZZES.find(q => q.lessonId === lesson.id)
   const relatedLessons = allLessons.filter(l => lesson.relatedLessonIds.includes(l.id))
+  const diagrams = lesson.diagramIds.map(id => getDiagram(id)).filter(Boolean) as NonNullable<ReturnType<typeof getDiagram>>[]
 
   const rawVideoUrl = videoUrls[lesson.id] ?? lesson.videoUrl
   const embedUrl = rawVideoUrl ? parseVideoUrl(rawVideoUrl) : null
@@ -202,6 +205,15 @@ export default function LessonDetailPage() {
               </div>
             </div>
           )}
+
+          {/* ── Interactive Diagrams ──────────────────────────── */}
+          {diagrams.map(diagram => (
+            <TrackDiagramView
+              key={diagram.id}
+              diagram={diagram}
+              accentColor={accentColor}
+            />
+          ))}
 
           {/* ── Key Takeaways ──────────────────────────────────── */}
           <div
