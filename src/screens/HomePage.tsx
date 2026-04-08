@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Flag, ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { MOCK_LESSONS, MOCK_MODULES } from '@/lib/mockData'
 import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
@@ -9,8 +10,89 @@ const featuredLessons = MOCK_LESSONS.filter(l => l.isFeatured)
 const racingLessons   = MOCK_LESSONS.filter(l => l.pillar === 'racing')
 const carLessons      = MOCK_LESSONS.filter(l => l.pillar === 'car')
 
-const RACING_CATS = ['Racecraft', 'Braking', 'Cornering', 'Overtaking', 'Defense']
-const CAR_CATS    = ['Suspension', 'Brakes', 'Tires', 'Drivetrain', 'Engine']
+function useCountUp(target: number, duration = 900, delay = 120) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const start = performance.now()
+      const tick = (now: number) => {
+        const progress = Math.min((now - start) / duration, 1)
+        // ease-out cubic
+        const eased = 1 - Math.pow(1 - progress, 3)
+        setCount(Math.round(eased * target))
+        if (progress < 1) requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    }, delay)
+    return () => clearTimeout(timeout)
+  }, [target, duration, delay])
+  return count
+}
+
+const STATS = [
+  { target: MOCK_LESSONS.length, label: 'Lessons',  delay: 120 },
+  { target: MOCK_MODULES.length, label: 'Modules',  delay: 220 },
+  { target: 2,                   label: 'Pillars',  delay: 320 },
+]
+
+function StatPanel() {
+  const counts = [
+    useCountUp(STATS[0].target, 900, STATS[0].delay),
+    useCountUp(STATS[1].target, 900, STATS[1].delay),
+    useCountUp(STATS[2].target, 900, STATS[2].delay),
+  ]
+  return (
+    <div style={{
+      borderRadius: 14,
+      border: '1px solid var(--border)',
+      background: 'rgba(255,255,255,0.025)',
+      backdropFilter: 'blur(12px)',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      gap: 0,
+      overflow: 'hidden',
+    }}>
+      {STATS.map((s, i) => (
+        <div
+          key={s.label}
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '32px 20px',
+            borderBottom: i < STATS.length - 1 ? '1px solid var(--border)' : 'none',
+          }}
+        >
+          <span style={{
+            display: 'block',
+            fontSize: 'clamp(52px, 6vw, 72px)',
+            fontWeight: 900,
+            letterSpacing: '-0.05em',
+            color: 'var(--text)',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {counts[i]}
+          </span>
+          <span style={{
+            display: 'block',
+            marginTop: 8,
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--text-tertiary)',
+          }}>
+            {s.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function HomePage() {
   const [loading, done] = usePageLoader(380)
@@ -92,102 +174,7 @@ export default function HomePage() {
           </div>
 
           {/* Right: stat panel */}
-          <div style={{
-            borderRadius: 14,
-            border: '1px solid var(--border)',
-            background: 'rgba(255,255,255,0.025)',
-            backdropFilter: 'blur(12px)',
-            overflow: 'hidden',
-          }}>
-            {/* Total bar */}
-            <div style={{
-              padding: '22px 28px',
-              borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              gap: 32,
-            }}>
-              {[
-                { n: MOCK_LESSONS.length, label: 'Lessons' },
-                { n: MOCK_MODULES.length, label: 'Modules' },
-                { n: 2, label: 'Pillars' },
-              ].map(s => (
-                <div key={s.label}>
-                  <p style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--text)', lineHeight: 1 }}>
-                    {s.n}
-                  </p>
-                  <p style={{ margin: '5px 0 0', fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                    {s.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Racing block */}
-            <Link to="/lessons?pillar=racing" style={{ textDecoration: 'none', display: 'block' }}>
-              <div
-                style={{ padding: '22px 28px', borderBottom: '1px solid var(--border)', cursor: 'pointer', transition: 'background 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(232,50,42,0.06)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18 }}>🏁</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Racing</span>
-                    <span style={{
-                      fontSize: 11, fontWeight: 700, padding: '3px 9px',
-                      borderRadius: 999, background: 'rgba(232,50,42,0.12)',
-                      border: '1px solid rgba(232,50,42,0.25)', color: '#E8322A',
-                    }}>
-                      {racingLessons.length} lessons
-                    </span>
-                  </div>
-                  <ArrowRight size={14} color="#E8322A" />
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {['Racecraft', 'Braking', 'Cornering', 'Overtaking', 'Defense', 'Sim Technique'].map(c => (
-                    <span key={c} style={{
-                      fontSize: 11, padding: '4px 10px', borderRadius: 6,
-                      background: 'var(--surface)', border: '1px solid var(--border)',
-                      color: 'var(--text-tertiary)',
-                    }}>{c}</span>
-                  ))}
-                </div>
-              </div>
-            </Link>
-
-            {/* Car Knowledge block */}
-            <Link to="/lessons?pillar=car" style={{ textDecoration: 'none', display: 'block' }}>
-              <div
-                style={{ padding: '22px 28px', cursor: 'pointer', transition: 'background 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,158,219,0.06)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18 }}>🔧</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Car Knowledge</span>
-                    <span style={{
-                      fontSize: 11, fontWeight: 700, padding: '3px 9px',
-                      borderRadius: 999, background: 'rgba(74,158,219,0.12)',
-                      border: '1px solid rgba(74,158,219,0.25)', color: '#4A9EDB',
-                    }}>
-                      {carLessons.length} lessons
-                    </span>
-                  </div>
-                  <ArrowRight size={14} color="#4A9EDB" />
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {['Suspension', 'Brakes', 'Tires', 'Drivetrain', 'Engine', 'Aerodynamics', 'Setup'].map(c => (
-                    <span key={c} style={{
-                      fontSize: 11, padding: '4px 10px', borderRadius: 6,
-                      background: 'var(--surface)', border: '1px solid var(--border)',
-                      color: 'var(--text-tertiary)',
-                    }}>{c}</span>
-                  ))}
-                </div>
-              </div>
-            </Link>
-          </div>
+          <StatPanel />
         </div>
       </section>
 
