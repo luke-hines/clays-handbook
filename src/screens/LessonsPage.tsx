@@ -3,54 +3,129 @@ import { useSearchParams } from 'react-router-dom'
 import { MOCK_LESSONS } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
 import LessonCard from '@/components/learner/LessonCard'
-import { Flag, Wrench, Search, BookOpen } from 'lucide-react'
+import { Flag, Wrench, Search, BookOpen, X } from 'lucide-react'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
-import type { Pillar, Difficulty } from '@/types'
+import type { Pillar, Difficulty, LessonCategory } from '@/types'
 
-const PILLARS: { value: Pillar | 'all'; label: string; icon?: React.ReactNode }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'racing', label: 'Racing', icon: <Flag size={12} /> },
-  { value: 'car', label: 'Car Knowledge', icon: <Wrench size={12} /> },
+// ── Filter definitions ────────────────────────────────────────────────────────
+
+const PILLARS: { value: Pillar | 'all'; label: string; color: string }[] = [
+  { value: 'all',    label: 'All',          color: 'var(--text)' },
+  { value: 'racing', label: 'Racing',       color: '#E8322A' },
+  { value: 'car',    label: 'Car Knowledge', color: '#4A9EDB' },
 ]
 
-const DIFFICULTIES: { value: Difficulty | 'all'; label: string }[] = [
-  { value: 'all', label: 'All levels' },
-  { value: 'beginner', label: 'Beginner' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'advanced', label: 'Advanced' },
+const DIFFICULTIES: { value: Difficulty | 'all'; label: string; color: string }[] = [
+  { value: 'all',          label: 'All levels',   color: 'var(--text)' },
+  { value: 'beginner',     label: 'Beginner',     color: '#3DAB6E' },
+  { value: 'intermediate', label: 'Intermediate', color: '#C9A84C' },
+  { value: 'advanced',     label: 'Advanced',     color: '#E8322A' },
 ]
 
-function FilterBtn({
+const RACING_CATS: { value: LessonCategory | 'all'; label: string }[] = [
+  { value: 'all',           label: 'All topics' },
+  { value: 'racecraft',     label: 'Racecraft' },
+  { value: 'braking',       label: 'Braking' },
+  { value: 'cornering',     label: 'Cornering' },
+  { value: 'overtaking',    label: 'Overtaking' },
+  { value: 'defense',       label: 'Defense' },
+  { value: 'sim-technique', label: 'Sim Technique' },
+]
+
+const CAR_CATS: { value: LessonCategory | 'all'; label: string }[] = [
+  { value: 'all',          label: 'All topics' },
+  { value: 'suspension',   label: 'Suspension' },
+  { value: 'brakes',       label: 'Brakes' },
+  { value: 'drivetrain',   label: 'Drivetrain' },
+  { value: 'tires',        label: 'Tires' },
+  { value: 'aerodynamics', label: 'Aerodynamics' },
+  { value: 'engine',       label: 'Engine' },
+  { value: 'setup',        label: 'Setup' },
+]
+
+// ── Segment control ───────────────────────────────────────────────────────────
+
+function Segment<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string; color?: string }[]
+  value: T
+  onChange: (v: T) => void
+}) {
+  return (
+    <div style={{
+      display: 'flex',
+      gap: 2,
+      background: 'var(--surface-2)',
+      borderRadius: 9,
+      padding: 3,
+      border: '1px solid var(--border)',
+    }}>
+      {options.map(opt => {
+        const active = value === opt.value
+        return (
+          <button
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            style={{
+              padding: '5px 12px',
+              borderRadius: 7,
+              fontSize: 12,
+              fontWeight: active ? 700 : 500,
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              background: active ? 'var(--surface-3)' : 'transparent',
+              color: active ? (opt.color ?? 'var(--text)') : 'var(--text-tertiary)',
+              boxShadow: active ? '0 1px 4px rgba(0,0,0,0.35)' : 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Category pill ─────────────────────────────────────────────────────────────
+
+function CatPill({
   active,
   onClick,
   children,
-  color,
+  accentColor,
 }: {
   active: boolean
   onClick: () => void
   children: React.ReactNode
-  color?: string
+  accentColor: string
 }) {
   return (
     <button
       onClick={onClick}
       style={{
-        padding: '6px 14px',
-        borderRadius: 8,
-        fontSize: 13,
-        fontWeight: 600,
-        border: '1px solid',
+        padding: '4px 11px',
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: active ? 700 : 500,
+        border: `1px solid ${active ? accentColor + '60' : 'var(--border)'}`,
+        background: active ? accentColor + '18' : 'transparent',
+        color: active ? accentColor : 'var(--text-tertiary)',
         cursor: 'pointer',
         transition: 'all 0.15s',
-        borderColor: active ? (color ?? 'var(--text-secondary)') : 'var(--border)',
-        background: active ? `${color ? color + '18' : 'var(--surface-2)'}` : 'transparent',
-        color: active ? (color ?? 'var(--text)') : 'var(--text-secondary)',
+        whiteSpace: 'nowrap',
       }}
     >
       {children}
     </button>
   )
 }
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function LessonsPage() {
   const [loading, done] = usePageLoader(360)
@@ -59,14 +134,21 @@ export default function LessonsPage() {
 
   const [pillar, setPillar] = useState<Pillar | 'all'>(initialPillar)
   const [difficulty, setDifficulty] = useState<Difficulty | 'all'>('all')
+  const [category, setCategory] = useState<LessonCategory | 'all'>('all')
   const [search, setSearch] = useState('')
   const publishedLessons = useAppStore(s => s.publishedLessons)
   const allLessons = useMemo(() => [...MOCK_LESSONS, ...publishedLessons], [publishedLessons])
+
+  const handlePillarChange = (p: Pillar | 'all') => {
+    setPillar(p)
+    setCategory('all') // reset category when switching pillar
+  }
 
   const filtered = useMemo(() => {
     return allLessons.filter(l => {
       if (pillar !== 'all' && l.pillar !== pillar) return false
       if (difficulty !== 'all' && l.difficulty !== difficulty) return false
+      if (category !== 'all' && l.category !== category) return false
       if (search) {
         const q = search.toLowerCase()
         return (
@@ -77,126 +159,255 @@ export default function LessonsPage() {
       }
       return true
     })
-  }, [pillar, difficulty, search, allLessons])
+  }, [pillar, difficulty, category, search, allLessons])
+
+  // Stats
+  const racingCount = allLessons.filter(l => l.pillar === 'racing').length
+  const carCount    = allLessons.filter(l => l.pillar === 'car').length
+  const advCount    = allLessons.filter(l => l.difficulty === 'advanced').length
+
+  const isFiltered = pillar !== 'all' || difficulty !== 'all' || category !== 'all' || search !== ''
+  const clearAll   = () => { setPillar('all'); setDifficulty('all'); setCategory('all'); setSearch('') }
+
+  const accentColor = pillar === 'racing' ? '#E8322A' : pillar === 'car' ? '#4A9EDB' : '#E8322A'
+  const cats = pillar === 'car' ? CAR_CATS : RACING_CATS
 
   if (loading) return <PageLoader icon={<BookOpen size={30} />} label="Lessons" color="#E8322A" duration={360} onDone={done} />
+
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
-      {/* Header */}
-      <div
-        style={{
-          borderBottom: '1px solid var(--border)',
-          padding: '40px 24px 28px',
-          background: 'var(--surface)',
-        }}
-      >
-        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-          <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-            Library
-          </p>
-          <h1 style={{ margin: '0 0 24px', fontSize: 30, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>
-            Lessons
-          </h1>
 
-          {/* Search */}
-          <div style={{ position: 'relative', maxWidth: 360, marginBottom: 20 }}>
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', pointerEvents: 'none', display: 'flex' }}>
-              <Search size={14} />
-            </span>
-            <input
-              type="text"
-              placeholder="Search lessons..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '9px 12px 9px 36px',
-                borderRadius: 8,
-                border: '1px solid var(--border-strong)',
-                background: 'var(--surface-2)',
-                color: 'var(--text)',
-                fontSize: 14,
-                outline: 'none',
-                transition: 'border-color 0.15s',
-              }}
-              onFocus={e => (e.target.style.borderColor = 'var(--text-tertiary)')}
-              onBlur={e => (e.target.style.borderColor = 'var(--border-strong)')}
-            />
+      {/* ── Hero bar ──────────────────────────────────────────────────────── */}
+      <div style={{
+        background: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto', padding: '28px 24px 0' }}>
+
+          {/* Top row: title + search */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            gap: 24,
+            flexWrap: 'wrap',
+            marginBottom: 20,
+          }}>
+            {/* Left: title + stat chips */}
+            <div>
+              <p style={{
+                margin: '0 0 4px',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--text-tertiary)',
+              }}>
+                Library
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                <h1 style={{
+                  margin: 0,
+                  fontSize: 26,
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  color: 'var(--text)',
+                  lineHeight: 1,
+                }}>
+                  Lessons
+                </h1>
+                {/* Stat chips */}
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: '3px 9px',
+                    borderRadius: 999, background: 'rgba(232,50,42,0.1)',
+                    border: '1px solid rgba(232,50,42,0.25)', color: '#E8322A',
+                  }}>
+                    {racingCount} Racing
+                  </span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: '3px 9px',
+                    borderRadius: 999, background: 'rgba(74,158,219,0.1)',
+                    border: '1px solid rgba(74,158,219,0.25)', color: '#4A9EDB',
+                  }}>
+                    {carCount} Car
+                  </span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, padding: '3px 9px',
+                    borderRadius: 999, background: 'rgba(201,168,76,0.1)',
+                    border: '1px solid rgba(201,168,76,0.25)', color: '#C9A84C',
+                  }}>
+                    {advCount} Advanced
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: search */}
+            <div style={{ position: 'relative', width: 260, flexShrink: 0 }}>
+              <span style={{
+                position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)',
+                color: 'var(--text-tertiary)', pointerEvents: 'none', display: 'flex',
+              }}>
+                <Search size={13} />
+              </span>
+              <input
+                type="text"
+                placeholder="Search lessons..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px 32px 8px 32px',
+                  borderRadius: 8,
+                  border: '1px solid var(--border-strong)',
+                  background: 'var(--surface-2)',
+                  color: 'var(--text)',
+                  fontSize: 13,
+                  outline: 'none',
+                  transition: 'border-color 0.15s',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={e => (e.target.style.borderColor = accentColor + '80')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border-strong)')}
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  style={{
+                    position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                    color: 'var(--text-tertiary)', display: 'flex',
+                  }}
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Filters */}
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {PILLARS.map(p => (
-                <FilterBtn
-                  key={p.value}
-                  active={pillar === p.value}
-                  onClick={() => setPillar(p.value)}
-                  color={p.value === 'racing' ? '#E8322A' : p.value === 'car' ? '#4A9EDB' : undefined}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    {p.icon}{p.label}
-                  </span>
-                </FilterBtn>
-              ))}
-            </div>
+          {/* Filter row */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+            paddingBottom: 16,
+          }}>
+            {/* Pillar segment */}
+            <Segment
+              options={PILLARS}
+              value={pillar}
+              onChange={handlePillarChange}
+            />
 
-            <div style={{ width: 1, height: 20, background: 'var(--border)', flexShrink: 0 }} />
+            <div style={{ width: 1, height: 24, background: 'var(--border)', flexShrink: 0 }} />
 
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {DIFFICULTIES.map(d => (
-                <FilterBtn
-                  key={d.value}
-                  active={difficulty === d.value}
-                  onClick={() => setDifficulty(d.value)}
-                  color={
-                    d.value === 'beginner' ? '#3DAB6E'
-                    : d.value === 'intermediate' ? '#C9A84C'
-                    : d.value === 'advanced' ? '#E8322A'
-                    : undefined
-                  }
+            {/* Difficulty segment */}
+            <Segment
+              options={DIFFICULTIES}
+              value={difficulty}
+              onChange={setDifficulty}
+            />
+
+            {isFiltered && (
+              <>
+                <div style={{ width: 1, height: 24, background: 'var(--border)', flexShrink: 0 }} />
+                <button
+                  onClick={clearAll}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 5,
+                    fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)',
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px',
+                    borderRadius: 6,
+                  }}
                 >
-                  {d.label}
-                </FilterBtn>
-              ))}
-            </div>
+                  <X size={11} /> Clear
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Category strip */}
+        <div style={{
+          borderTop: '1px solid var(--border)',
+          background: 'rgba(0,0,0,0.2)',
+        }}>
+          <div style={{
+            maxWidth: 1120, margin: '0 auto', padding: '10px 24px',
+            display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center',
+          }}>
+            {pillar !== 'all' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginRight: 4 }}>
+                {pillar === 'racing'
+                  ? <Flag size={11} color={accentColor} />
+                  : <Wrench size={11} color={accentColor} />}
+                <span style={{ fontSize: 11, fontWeight: 700, color: accentColor, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  {pillar === 'racing' ? 'Racing' : 'Car Knowledge'}
+                </span>
+              </div>
+            )}
+            {cats.map(c => (
+              <CatPill
+                key={c.value}
+                active={category === c.value}
+                onClick={() => setCategory(c.value)}
+                accentColor={accentColor}
+              >
+                {c.label}
+              </CatPill>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Results */}
-      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
+      {/* ── Results ───────────────────────────────────────────────────────── */}
+      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '24px 24px 48px' }}>
+
+        {/* Result count */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginBottom: 18,
+        }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)' }}>
             {filtered.length} {filtered.length === 1 ? 'lesson' : 'lessons'}
-            {pillar !== 'all' || difficulty !== 'all' || search ? ' — filtered' : ''}
+            {isFiltered ? ' — filtered' : ''}
           </span>
-          {(pillar !== 'all' || difficulty !== 'all' || search) && (
-            <button
-              onClick={() => { setPillar('all'); setDifficulty('all'); setSearch('') }}
-              style={{
-                fontSize: 13,
-                color: 'var(--text-tertiary)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                textDecoration: 'underline',
-              }}
-            >
-              Clear filters
-            </button>
-          )}
         </div>
 
         {filtered.length === 0 ? (
-          <div style={{ padding: '64px 0', textAlign: 'center', color: 'var(--text-tertiary)' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text-secondary)' }}>No lessons match those filters</p>
-            <p style={{ margin: '6px 0 0', fontSize: 14 }}>Try changing the pillar or difficulty.</p>
+          <div style={{
+            padding: '64px 0', textAlign: 'center',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+          }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 14, background: 'var(--surface)',
+              border: '1px solid var(--border)', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', color: 'var(--text-tertiary)',
+            }}>
+              <Search size={22} />
+            </div>
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-secondary)' }}>
+              No lessons match those filters
+            </p>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text-tertiary)' }}>
+              Try adjusting the pillar, difficulty, or topic.
+            </p>
+            <button
+              onClick={clearAll}
+              className="btn-ghost"
+              style={{ marginTop: 4 }}
+            >
+              Clear filters
+            </button>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: 14,
+          }}>
             {filtered.map(lesson => (
               <LessonCard key={lesson.id} lesson={lesson} />
             ))}
