@@ -12,6 +12,9 @@ import GlossaryPage    from '@/screens/GlossaryPage'
 import ModulesPage     from '@/screens/ModulesPage'
 import QuizPage        from '@/screens/QuizPage'
 
+// Tools
+import ToolsPage from '@/screens/ToolsPage'
+
 // Creator screens
 import CreatorDashboard  from '@/screens/CreatorDashboard'
 import LessonGenerator   from '@/screens/LessonGenerator'
@@ -29,6 +32,9 @@ export default function App() {
           <Route path="/glossary"                element={<GlossaryPage />} />
           <Route path="/modules"                 element={<ModulesPage />} />
           <Route path="/quiz/:lessonSlug"        element={<QuizPage />} />
+
+          {/* Tools */}
+          <Route path="/tools"                   element={<ToolsPage />} />
 
           {/* Creator */}
           <Route path="/creator"                 element={<CreatorDashboard />} />

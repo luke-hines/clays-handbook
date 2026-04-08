@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { to: '/lessons',  label: 'Lessons'  },
   { to: '/glossary', label: 'Glossary' },
   { to: '/modules',  label: 'Modules'  },
+  { to: '/tools',    label: 'Tools'    },
 ]
 
 export default function Nav() {
