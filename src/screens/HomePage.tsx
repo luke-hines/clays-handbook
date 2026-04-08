@@ -46,8 +46,7 @@ function StatPanel() {
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-around',
-      height: '100%',
+      justifyContent: 'space-evenly',
     }}>
       {STATS.map((s, i) => (
         <div
@@ -97,13 +96,13 @@ export default function HomePage() {
       <section style={{
         borderBottom: '1px solid var(--border)',
         background: 'linear-gradient(160deg, #111 0%, #0D0D0D 60%, #0a0810 100%)',
-        padding: '56px 24px 52px',
+        padding: '64px 24px',
       }}>
         <div style={{
           maxWidth: 1120, margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: '1fr 380px',
-          gap: 48,
+          gridTemplateColumns: '1fr 1fr',
+          gap: 64,
           alignItems: 'center',
         }}>
 
