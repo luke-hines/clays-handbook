@@ -43,27 +43,19 @@ function StatPanel() {
   ]
   return (
     <div style={{
-      borderRadius: 14,
-      border: '1px solid var(--border)',
-      background: 'rgba(255,255,255,0.025)',
-      backdropFilter: 'blur(12px)',
       display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      gap: 0,
-      overflow: 'hidden',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-around',
+      height: '100%',
     }}>
       {STATS.map((s, i) => (
         <div
           key={s.label}
           style={{
-            flex: 1,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            padding: '32px 20px',
-            borderBottom: i < STATS.length - 1 ? '1px solid var(--border)' : 'none',
           }}
         >
           <span style={{
