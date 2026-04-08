@@ -193,6 +193,108 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Pillar split ──────────────────────────────────────────────────── */}
+      <section style={{ borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+
+          {/* Racing */}
+          <Link to="/lessons?pillar=racing" style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                padding: '36px 40px',
+                borderRight: '1px solid var(--border)',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(232,50,42,0.04)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {/* Accent line top */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: '#E8322A' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    width: 38, height: 38, borderRadius: 10, display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', fontSize: 20,
+                    background: 'rgba(232,50,42,0.1)', border: '1px solid rgba(232,50,42,0.2)',
+                  }}>🏁</span>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Racing</p>
+                    <p style={{ margin: 0, fontSize: 11, color: '#E8322A', fontWeight: 700 }}>{racingLessons.length} lessons</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} color="#E8322A" />
+              </div>
+
+              <p style={{ margin: '0 0 18px', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 340 }}>
+                Sim-first racecraft — trail braking, corner linking, overtaking strategy, tire deg management, and the mental side of racing.
+              </p>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {['Racecraft', 'Braking', 'Cornering', 'Overtaking', 'Defense', 'Sim Technique'].map(c => (
+                  <span key={c} style={{
+                    fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 999,
+                    background: 'rgba(232,50,42,0.08)', border: '1px solid rgba(232,50,42,0.2)',
+                    color: '#E8322A',
+                  }}>{c}</span>
+                ))}
+              </div>
+            </div>
+          </Link>
+
+          {/* Car Knowledge */}
+          <Link to="/lessons?pillar=car" style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                padding: '36px 40px',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(74,158,219,0.04)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {/* Accent line top */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: '#4A9EDB' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    width: 38, height: 38, borderRadius: 10, display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', fontSize: 20,
+                    background: 'rgba(74,158,219,0.1)', border: '1px solid rgba(74,158,219,0.2)',
+                  }}>🔧</span>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>Car Knowledge</p>
+                    <p style={{ margin: 0, fontSize: 11, color: '#4A9EDB', fontWeight: 700 }}>{carLessons.length} lessons</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} color="#4A9EDB" />
+              </div>
+
+              <p style={{ margin: '0 0 18px', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 340 }}>
+                How the hardware actually works — suspension geometry, brake systems, differential tuning, turbo power delivery, and setup philosophy.
+              </p>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {['Suspension', 'Brakes', 'Tires', 'Drivetrain', 'Engine', 'Setup', 'Aerodynamics'].map(c => (
+                  <span key={c} style={{
+                    fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 999,
+                    background: 'rgba(74,158,219,0.08)', border: '1px solid rgba(74,158,219,0.2)',
+                    color: '#4A9EDB',
+                  }}>{c}</span>
+                ))}
+              </div>
+            </div>
+          </Link>
+
+        </div>
+      </section>
+
       {/* ── Featured Lessons ──────────────────────────────────────────────── */}
       <section style={{ padding: '40px 24px 0' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
