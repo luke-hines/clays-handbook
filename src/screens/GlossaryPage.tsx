@@ -598,7 +598,7 @@ export default function GlossaryPage() {
     </button>
   )
 
-  if (loading) return <PageLoader icon={<Library size={30} />} label="Glossary" color="#4A9EDB" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<Library size={40} />} label="Glossary" color="#4A9EDB" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

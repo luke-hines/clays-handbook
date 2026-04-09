@@ -35,7 +35,7 @@ export default function LessonDetailPage() {
   const accentColor = lesson.pillar === 'racing' ? '#E8322A' : '#4A9EDB'
   if (loading) return (
     <PageLoader
-      icon={<Icon name={lesson.emoji} size={30} />}
+      icon={<Icon name={lesson.emoji} size={40} />}
       label={lesson.title}
       color={accentColor}
       duration={400}

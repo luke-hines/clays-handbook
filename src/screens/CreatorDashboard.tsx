@@ -391,7 +391,7 @@ export default function CreatorDashboard() {
     </button>
   )
 
-  if (loading) return <PageLoader icon={<PenLine size={30} />} label="Creator" color="#C9A84C" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<PenLine size={40} />} label="Creator" color="#C9A84C" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

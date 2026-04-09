@@ -53,8 +53,8 @@ export default function PageLoader({
       {/* Icon ring */}
       <div
         style={{
-          width: 72,
-          height: 72,
+          width: 90,
+          height: 90,
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',

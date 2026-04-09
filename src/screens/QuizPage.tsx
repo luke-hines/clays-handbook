@@ -24,7 +24,7 @@ export default function QuizPage() {
 
   if (loading) return (
     <PageLoader
-      icon={lesson ? <Icon name={lesson.emoji} size={30} /> : <HelpCircle size={30} />}
+      icon={lesson ? <Icon name={lesson.emoji} size={40} /> : <HelpCircle size={40} />}
       label={lesson ? `${lesson.title} — Quiz` : 'Quiz'}
       color={lesson?.pillar === 'racing' ? '#E8322A' : '#4A9EDB'}
       duration={380}

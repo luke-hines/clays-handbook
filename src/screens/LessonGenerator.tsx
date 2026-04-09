@@ -168,7 +168,7 @@ export default function LessonGenerator() {
   const accentColor = pillar === 'racing' ? 'var(--red)' : 'var(--pillar-car)'
   const accentHex = pillar === 'racing' ? '#E8322A' : '#4A9EDB'
 
-  if (loading) return <PageLoader icon={<Wand2 size={30} />} label="Lesson Generator" color="#C9A84C" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<Wand2 size={40} />} label="Lesson Generator" color="#C9A84C" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* ── Header ──────────────────────────────────────────────── */}

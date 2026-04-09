@@ -87,7 +87,7 @@ function StatPanel() {
 
 export default function HomePage() {
   const [loading, done] = usePageLoader(380)
-  if (loading) return <PageLoader icon={<Flag size={30} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={380} onDone={done} />
+  if (loading) return <PageLoader icon={<Flag size={44} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={620} onDone={done} />
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>

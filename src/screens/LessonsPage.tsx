@@ -172,7 +172,7 @@ export default function LessonsPage() {
   const accentColor = pillar === 'racing' ? '#E8322A' : pillar === 'car' ? '#4A9EDB' : '#E8322A'
   const cats = pillar === 'car' ? CAR_CATS : RACING_CATS
 
-  if (loading) return <PageLoader icon={<BookOpen size={30} />} label="Lessons" color="#E8322A" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<BookOpen size={40} />} label="Lessons" color="#E8322A" duration={360} onDone={done} />
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
