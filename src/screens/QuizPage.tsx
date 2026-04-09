@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { MOCK_LESSONS, MOCK_QUIZZES } from '@/lib/mockData'
+import { useAppStore } from '@/lib/store'
 import { Trophy, CheckCircle2, BookOpen, HelpCircle } from 'lucide-react'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import Icon from '@/components/shared/Icon'
@@ -19,6 +20,10 @@ export default function QuizPage() {
   const [selected, setSelected] = useState<AnswerState>(null)
   const [showExplanation, setShowExplanation] = useState(false)
   const [finished, setFinished] = useState(false)
+  const [savedScore, setSavedScore] = useState(false)
+
+  const saveQuizScore = useAppStore(s => s.saveQuizScore)
+  const markCompleted = useAppStore(s => s.markCompleted)
 
   if (!lesson || !quiz) return <Navigate to="/lessons" replace />
 
@@ -62,8 +67,15 @@ export default function QuizPage() {
     const finalScore = [...answers].filter((a, i) => a === quiz.questions[i].correctIndex).length
     const pct = Math.round((finalScore / totalQuestions) * 100)
 
+    // Save score once
+    if (!savedScore) {
+      setSavedScore(true)
+      saveQuizScore(lesson.id, pct)
+      if (pct >= 66) markCompleted(lesson.id)
+    }
+
     return (
-      <div className="screen-enter" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+      <div className="screen-enter" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(20px, 4vw, 40px) 24px' }}>
         <div style={{ maxWidth: 520, width: '100%', textAlign: 'center' }}>
           <div style={{
             width: 80, height: 80, borderRadius: '50%', margin: '0 auto 16px',
@@ -192,7 +204,7 @@ export default function QuizPage() {
       </div>
 
       {/* Question */}
-      <div style={{ maxWidth: 680, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: 'clamp(20px, 4vw, 40px) 24px' }}>
         <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
           Question {currentIndex + 1}
         </p>

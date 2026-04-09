@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAppStore } from '@/lib/store'
-import { generateDraft, type GenerateInput } from '@/lib/generate'
+import { generateDraft, type GenerateInput, type GenerateOutput } from '@/lib/generate'
 import { Flag, Wrench, Wand2 } from 'lucide-react'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { Pillar, Difficulty, LessonCategory, LessonDraft } from '@/types'
@@ -114,8 +114,9 @@ export default function LessonGenerator() {
   // Generation state
   const [generating, setGenerating] = useState(false)
   const [stepIndex, setStepIndex] = useState(0)
-  const [output, setOutput] = useState<ReturnType<typeof generateDraft> | null>(null)
+  const [output, setOutput] = useState<GenerateOutput | null>(null)
   const [saved, setSaved] = useState(false)
+  const [genError, setGenError] = useState<string | null>(null)
 
   const categories = pillar === 'racing' ? RACING_CATEGORIES : CAR_CATEGORIES
 
@@ -130,19 +131,27 @@ export default function LessonGenerator() {
     if (!canGenerate || generating) return
     setOutput(null)
     setSaved(false)
+    setGenError(null)
     setGenerating(true)
     setStepIndex(0)
 
-    // Simulate staged generation
-    for (let i = 0; i < GENERATING_STEPS.length; i++) {
-      await new Promise(r => setTimeout(r, 380))
-      setStepIndex(i)
-    }
-    await new Promise(r => setTimeout(r, 300))
-
+    // Animate steps while API call is in flight
     const input: GenerateInput = { topic: topic.trim(), pillar, category, difficulty, goal: goal.trim() }
-    setOutput(generateDraft(input))
-    setGenerating(false)
+    const stepInterval = setInterval(() => {
+      setStepIndex(i => Math.min(i + 1, GENERATING_STEPS.length - 1))
+    }, 600)
+
+    try {
+      const result = await generateDraft(input)
+      clearInterval(stepInterval)
+      setOutput(result)
+    } catch (err) {
+      clearInterval(stepInterval)
+      const message = err instanceof Error ? err.message : 'Generation failed. Please try again.'
+      setGenError(message)
+    } finally {
+      setGenerating(false)
+    }
   }
 
   const handleSave = () => {
@@ -174,7 +183,7 @@ export default function LessonGenerator() {
       {/* ── Header ──────────────────────────────────────────────── */}
       <div style={{
         borderBottom: '1px solid var(--border)',
-        padding: '32px 24px 24px',
+        padding: 'clamp(16px, 3.5vw, 32px) 24px 24px',
         background: 'var(--surface)',
       }}>
         <div style={{ maxWidth: 760, margin: '0 auto' }}>
@@ -192,7 +201,7 @@ export default function LessonGenerator() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '36px 24px 80px' }}>
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(20px, 4vw, 36px) 24px clamp(40px, 8vw, 80px)' }}>
         {/* ── Form ────────────────────────────────────────────────── */}
         <div style={{
           padding: '28px',
@@ -391,8 +400,23 @@ export default function LessonGenerator() {
                 background: accentColor,
                 borderRadius: 999,
                 width: `${((stepIndex + 1) / GENERATING_STEPS.length) * 100}%`,
-                transition: 'width 0.38s ease',
+                transition: 'width 0.6s ease',
               }} />
+            </div>
+          )}
+
+          {/* Error state */}
+          {genError && (
+            <div style={{
+              marginTop: 12,
+              padding: '12px 16px',
+              borderRadius: 8,
+              background: 'rgba(232,50,42,0.08)',
+              border: '1px solid rgba(232,50,42,0.3)',
+            }}>
+              <p style={{ margin: 0, fontSize: 13, color: '#E8322A', lineHeight: 1.5 }}>
+                {genError}
+              </p>
             </div>
           )}
         </div>

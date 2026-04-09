@@ -53,9 +53,26 @@ function StatusBadge({ status }: { status: DraftStatus }) {
 
 function DraftCard({ draft }: { draft: LessonDraft }) {
   const [expanded, setExpanded] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [confirmPublish, setConfirmPublish] = useState(false)
   const { updateDraft, deleteDraft, publishDraft } = useAppStore()
+
+  // Edit state mirrors draft fields
+  const [editTitle, setEditTitle] = useState(draft.generatedTitle ?? draft.topic)
+  const [editSummary, setEditSummary] = useState(draft.generatedSummary ?? '')
+  const [editTakeaways, setEditTakeaways] = useState((draft.generatedTakeaways ?? []).join('\n'))
+  const [editBody, setEditBody] = useState(draft.generatedBody ?? '')
+
+  const handleSaveEdits = () => {
+    updateDraft(draft.id, {
+      generatedTitle: editTitle.trim() || draft.topic,
+      generatedSummary: editSummary.trim(),
+      generatedTakeaways: editTakeaways.split('\n').map(t => t.trim()).filter(Boolean),
+      generatedBody: editBody.trim(),
+    })
+    setEditing(false)
+  }
 
   const accentHex = draft.pillar === 'racing' ? '#E8322A' : '#4A9EDB'
   const date = new Date(draft.updatedAt).toLocaleDateString('en-US', {
@@ -120,7 +137,7 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
             </button>
 
             <button
-              onClick={() => setExpanded(e => !e)}
+              onClick={() => { setExpanded(e => !e); setEditing(false) }}
               style={{
                 padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600,
                 border: '1px solid var(--border)', background: 'transparent',
@@ -130,6 +147,21 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
             >
               {expanded ? 'Collapse' : 'View'}
+            </button>
+
+            <button
+              onClick={() => { setEditing(e => !e); setExpanded(true) }}
+              style={{
+                padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600,
+                border: `1px solid ${editing ? accentHex + '60' : 'var(--border)'}`,
+                background: editing ? `${accentHex}12` : 'transparent',
+                color: editing ? accentHex : 'var(--text-secondary)',
+                cursor: 'pointer', transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => { if (!editing) { e.currentTarget.style.borderColor = 'var(--text-tertiary)'; e.currentTarget.style.color = 'var(--text)' } }}
+              onMouseLeave={e => { if (!editing) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)' } }}
+            >
+              {editing ? 'Cancel Edit' : 'Edit'}
             </button>
 
             {/* Publish button */}
@@ -203,62 +235,122 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
       {expanded && (
         <div style={{ borderTop: '1px solid var(--border)' }}>
 
-          {/* Takeaways */}
-          {draft.generatedTakeaways && draft.generatedTakeaways.length > 0 && (
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
-              <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-                Takeaways
-              </p>
-              <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {draft.generatedTakeaways.map((t, i) => (
-                  <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: accentHex, flexShrink: 0, marginTop: 2 }}>{i + 1}.</span>
-                    <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>{t}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Body */}
-          {draft.generatedBody && (
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
-              <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
-                Body
-              </p>
-              <div style={{ maxHeight: 200, overflow: 'hidden', position: 'relative' }}>
-                {draft.generatedBody.split('\n\n').map((block, i) => {
-                  if (block.startsWith('## ')) {
-                    return <p key={i} style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{block.replace('## ', '')}</p>
-                  }
-                  return <p key={i} style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{block}</p>
-                })}
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to bottom, transparent, var(--surface))' }} />
+          {/* ── Inline Edit Form ── */}
+          {editing ? (
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>Title</label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 7, border: '1px solid var(--border-strong)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 14, outline: 'none', fontFamily: 'inherit' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>Summary</label>
+                <textarea
+                  value={editSummary}
+                  onChange={e => setEditSummary(e.target.value)}
+                  rows={2}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 7, border: '1px solid var(--border-strong)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 13, outline: 'none', resize: 'vertical', lineHeight: 1.55, fontFamily: 'inherit' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>
+                  Takeaways <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(one per line)</span>
+                </label>
+                <textarea
+                  value={editTakeaways}
+                  onChange={e => setEditTakeaways(e.target.value)}
+                  rows={5}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 7, border: '1px solid var(--border-strong)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 13, outline: 'none', resize: 'vertical', lineHeight: 1.7, fontFamily: 'inherit' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>Lesson Body (Markdown)</label>
+                <textarea
+                  value={editBody}
+                  onChange={e => setEditBody(e.target.value)}
+                  rows={10}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 7, border: '1px solid var(--border-strong)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 13, outline: 'none', resize: 'vertical', lineHeight: 1.65, fontFamily: 'monospace' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setEditing(false)}
+                  style={{ padding: '7px 16px', borderRadius: 7, fontSize: 13, fontWeight: 600, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdits}
+                  style={{ padding: '7px 16px', borderRadius: 7, fontSize: 13, fontWeight: 700, border: `1px solid ${accentHex}50`, background: `${accentHex}14`, color: accentHex, cursor: 'pointer' }}
+                >
+                  Save Edits
+                </button>
               </div>
             </div>
-          )}
+          ) : (
+            <>
+              {/* Takeaways */}
+              {draft.generatedTakeaways && draft.generatedTakeaways.length > 0 && (
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                  <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                    Takeaways
+                  </p>
+                  <ol style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {draft.generatedTakeaways.map((t, i) => (
+                      <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: accentHex, flexShrink: 0, marginTop: 2 }}>{i + 1}.</span>
+                        <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>{t}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
 
-          {/* Quiz questions count */}
-          {draft.generatedQuizQuestions && draft.generatedQuizQuestions.length > 0 && (
-            <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)' }}>
-              <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
-                {draft.generatedQuizQuestions.length} quiz question{draft.generatedQuizQuestions.length > 1 ? 's' : ''} generated
-              </span>
-            </div>
-          )}
+              {/* Body */}
+              {draft.generatedBody && (
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                  <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                    Body
+                  </p>
+                  <div style={{ maxHeight: 200, overflow: 'hidden', position: 'relative' }}>
+                    {draft.generatedBody.split('\n\n').map((block, i) => {
+                      if (block.startsWith('## ')) {
+                        return <p key={i} style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>{block.replace('## ', '')}</p>
+                      }
+                      return <p key={i} style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{block}</p>
+                    })}
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to bottom, transparent, var(--surface))' }} />
+                  </div>
+                </div>
+              )}
 
-          {/* Glossary suggestions */}
-          {draft.generatedGlossarySuggestions && draft.generatedGlossarySuggestions.length > 0 && (
-            <div style={{ padding: '12px 20px' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginRight: 10 }}>
-                Glossary
-              </span>
-              {draft.generatedGlossarySuggestions.map((term, i) => (
-                <span key={i} style={{ fontSize: 12, padding: '2px 8px', borderRadius: 4, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-tertiary)', marginRight: 6 }}>
-                  {term}
-                </span>
-              ))}
-            </div>
+              {/* Quiz questions count */}
+              {draft.generatedQuizQuestions && draft.generatedQuizQuestions.length > 0 && (
+                <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
+                    {draft.generatedQuizQuestions.length} quiz question{draft.generatedQuizQuestions.length > 1 ? 's' : ''} generated
+                  </span>
+                </div>
+              )}
+
+              {/* Glossary suggestions */}
+              {draft.generatedGlossarySuggestions && draft.generatedGlossarySuggestions.length > 0 && (
+                <div style={{ padding: '12px 20px' }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginRight: 10 }}>
+                    Glossary
+                  </span>
+                  {draft.generatedGlossarySuggestions.map((term, i) => (
+                    <span key={i} style={{ fontSize: 12, padding: '2px 8px', borderRadius: 4, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--text-tertiary)', marginRight: 6 }}>
+                      {term}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -397,7 +489,7 @@ export default function CreatorDashboard() {
       {/* Header */}
       <div style={{
         borderBottom: '1px solid var(--border)',
-        padding: '40px 24px 0',
+        padding: 'clamp(20px, 4vw, 40px) 24px 0',
         background: 'var(--surface)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -462,11 +554,11 @@ export default function CreatorDashboard() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(16px, 3.5vw, 32px) 24px' }}>
         {tab === 'drafts' && (
           drafts.length === 0 ? (
             <div style={{
-              padding: '80px 24px',
+              padding: 'clamp(40px, 8vw, 80px) 24px',
               textAlign: 'center',
               border: '1px dashed var(--border-strong)',
               borderRadius: 14,

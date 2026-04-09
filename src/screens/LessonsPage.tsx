@@ -244,7 +244,7 @@ export default function LessonsPage() {
             </div>
 
             {/* Right: search */}
-            <div style={{ position: 'relative', width: 260, flexShrink: 0 }}>
+            <div className="lessons-search" style={{ position: 'relative', maxWidth: 260, flexShrink: 1, width: '100%' }}>
               <span style={{
                 position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)',
                 color: 'var(--text-tertiary)', pointerEvents: 'none', display: 'flex',
@@ -363,7 +363,7 @@ export default function LessonsPage() {
       </div>
 
       {/* ── Results ───────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '24px 24px 48px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', padding: 'clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px) 48px' }}>
 
         {/* Result count */}
         <div style={{
