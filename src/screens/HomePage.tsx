@@ -29,10 +29,11 @@ function useCountUp(target: number, duration = 900, delay = 120) {
   return count
 }
 
+// Colors scale with value: highest = darkest blue, lowest = white
 const STATS = [
-  { target: MOCK_LESSONS.length, label: 'Lessons',  delay: 120 },
-  { target: MOCK_MODULES.length, label: 'Modules',  delay: 220 },
-  { target: 2,                   label: 'Pillars',  delay: 320 },
+  { target: MOCK_LESSONS.length, label: 'Lessons', delay: 120, color: '#1565A8' },
+  { target: MOCK_MODULES.length, label: 'Modules', delay: 220, color: '#4A9EDB' },
+  { target: 2,                   label: 'Pillars', delay: 320, color: '#F0EDE8' },
 ]
 
 function StatPanel() {
@@ -59,21 +60,22 @@ function StatPanel() {
         >
           <span style={{
             display: 'block',
-            fontSize: 'clamp(52px, 6vw, 72px)',
-            fontWeight: 900,
-            letterSpacing: '-0.05em',
-            color: 'var(--text)',
+            fontSize: 'clamp(52px, 6vw, 74px)',
+            fontWeight: 800,
+            letterSpacing: '-0.04em',
+            color: s.color,
             lineHeight: 1,
             fontVariantNumeric: 'tabular-nums',
+            fontStyle: 'italic',
           }}>
             {counts[i]}
           </span>
           <span style={{
             display: 'block',
-            marginTop: 8,
-            fontSize: 12,
+            marginTop: 10,
+            fontSize: 11,
             fontWeight: 700,
-            letterSpacing: '0.1em',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: 'var(--text-tertiary)',
           }}>
