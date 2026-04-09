@@ -9,7 +9,6 @@ import ConceptModal from '@/components/learner/ConceptModal'
 import LessonCard from '@/components/learner/LessonCard'
 import TrackDiagramView from '@/components/learner/TrackDiagram'
 import Icon from '@/components/shared/Icon'
-import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import { getDiagram } from '@/lib/diagramData'
 import { Bookmark } from 'lucide-react'
 import type { Concept } from '@/types'
@@ -23,7 +22,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export default function LessonDetailPage() {
-  const [loading, done] = usePageLoader(180)
   const { slug } = useParams<{ slug: string }>()
   const [openConcept, setOpenConcept] = useState<Concept | null>(null)
   const videoUrls = useAppStore(s => s.videoUrls)
@@ -48,15 +46,6 @@ export default function LessonDetailPage() {
   if (!lesson) return <Navigate to="/lessons" replace />
 
   const accentColor = lesson.pillar === 'racing' ? '#E8322A' : '#4A9EDB'
-  if (loading) return (
-    <PageLoader
-      icon={<Icon name={lesson.emoji} size={40} />}
-      label={lesson.title}
-      color={accentColor}
-      duration={180}
-      onDone={done}
-    />
-  )
 
   const concepts = MOCK_CONCEPTS.filter(c => lesson.conceptIds.includes(c.id))
   const quiz = MOCK_QUIZZES.find(q => q.lessonId === lesson.id)

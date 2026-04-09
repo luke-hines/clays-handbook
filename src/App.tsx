@@ -22,6 +22,7 @@ import ProgressPage from '@/screens/ProgressPage'
 // Creator screens
 import CreatorDashboard  from '@/screens/CreatorDashboard'
 import LessonGenerator   from '@/screens/LessonGenerator'
+import CreatorGate       from '@/components/shared/CreatorGate'
 
 export default function App() {
   return (
@@ -45,8 +46,8 @@ export default function App() {
           <Route path="/tools"                   element={<ToolsPage />} />
 
           {/* Creator */}
-          <Route path="/creator"                 element={<CreatorDashboard />} />
-          <Route path="/creator/generate"        element={<LessonGenerator />} />
+          <Route path="/creator"          element={<CreatorGate><CreatorDashboard /></CreatorGate>} />
+          <Route path="/creator/generate" element={<CreatorGate><LessonGenerator /></CreatorGate>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
