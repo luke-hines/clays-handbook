@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 interface PageLoaderProps {
   icon: React.ReactNode
@@ -16,6 +16,8 @@ export default function PageLoader({
   onDone,
 }: PageLoaderProps) {
   const [phase, setPhase] = useState<'in' | 'visible' | 'out'>('in')
+  const onDoneRef = useRef(onDone)
+  onDoneRef.current = onDone
 
   useEffect(() => {
     // in → visible after 80ms
@@ -23,9 +25,9 @@ export default function PageLoader({
     // visible → out after duration
     const t2 = setTimeout(() => setPhase('out'), duration)
     // call onDone after fade-out completes
-    const t3 = setTimeout(onDone, duration + 220)
+    const t3 = setTimeout(() => onDoneRef.current(), duration + 220)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-  }, [duration, onDone])
+  }, [duration]) // onDone intentionally excluded — accessed via ref
 
   const opacity = phase === 'in' ? 0 : phase === 'out' ? 0 : 1
   const scale   = phase === 'in' ? 0.96 : 1
@@ -108,6 +110,6 @@ export default function PageLoader({
 
 export function usePageLoader(_duration = 420): [boolean, () => void] {
   const [loading, setLoading] = useState(true)
-  const done = () => setLoading(false)
+  const done = useCallback(() => setLoading(false), [])
   return [loading, done]
 }
