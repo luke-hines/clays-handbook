@@ -1,13 +1,16 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
+import { useUser } from '@clerk/clerk-react'
 import { MOCK_LESSONS, MOCK_CONCEPTS, MOCK_QUIZZES, MOCK_MODULES } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
 import { parseVideoUrl } from '@/lib/videoUtils'
+import { hasCourseAccess } from '@/lib/access'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import ConceptModal from '@/components/learner/ConceptModal'
 import LessonCard from '@/components/learner/LessonCard'
 import TrackDiagramView from '@/components/learner/TrackDiagram'
+import PaywallBanner from '@/components/shared/PaywallBanner'
 import Icon from '@/components/shared/Icon'
 import { getDiagram } from '@/lib/diagramData'
 import { Bookmark } from 'lucide-react'
@@ -23,6 +26,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function LessonDetailPage() {
   const { slug } = useParams<{ slug: string }>()
+  const { user } = useUser()
   const [openConcept, setOpenConcept] = useState<Concept | null>(null)
   const videoUrls = useAppStore(s => s.videoUrls)
   const publishedLessons = useAppStore(s => s.publishedLessons)
@@ -349,7 +353,9 @@ export default function LessonDetailPage() {
           </div>
 
           {/* ── Body ──────────────────────────────────────────── */}
-          {lesson.body ? (
+          {!hasCourseAccess(user) ? (
+            <PaywallBanner type="course" />
+          ) : lesson.body ? (
             <div
               style={{ marginBottom: 32 }}
             >

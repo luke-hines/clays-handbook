@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useUser, UserButton } from '@clerk/clerk-react'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import SearchPalette from './SearchPalette'
-import { isCreatorAuthed } from './CreatorGate'
 
 const NAV_LINKS = [
   { to: '/lessons',  label: 'Lessons'  },
@@ -16,16 +16,13 @@ export default function Nav() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [creatorAuthed, setCreatorAuthed] = useState(isCreatorAuthed)
   const isMobile = useIsMobile()
   const location = useLocation()
   const menuRef = useRef<HTMLDivElement>(null)
+  const { isSignedIn } = useUser()
 
-  // Close menu on route change; re-check auth status
-  useEffect(() => {
-    setMenuOpen(false)
-    setCreatorAuthed(isCreatorAuthed())
-  }, [location.pathname])
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
   // Keyboard shortcut for search
   useEffect(() => {
@@ -205,41 +202,27 @@ export default function Nav() {
                 <span>Search</span>
               </button>
 
-              {creatorAuthed && (
-                <>
-                  <div style={{ width: 1, height: 20, background: 'rgba(240,237,232,0.1)', margin: '0 10px' }} />
+              <div style={{ width: 1, height: 20, background: 'rgba(240,237,232,0.1)', margin: '0 6px' }} />
 
-                  <Link
-                    to="/creator"
-                    style={{
-                      padding: '7px 16px',
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      textDecoration: 'none',
-                      color: '#fff',
-                      background: 'linear-gradient(135deg, #E8322A 0%, #c42a22 100%)',
-                      border: '1px solid rgba(232,50,42,0.4)',
-                      letterSpacing: '0.01em',
-                      transition: 'all 0.18s',
-                      boxShadow: '0 0 16px rgba(232,50,42,0.25), inset 0 1px 0 rgba(255,255,255,0.12)',
-                    }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget
-                      el.style.background = 'linear-gradient(135deg, #f03d35 0%, #d42e26 100%)'
-                      el.style.boxShadow = '0 0 24px rgba(232,50,42,0.45), inset 0 1px 0 rgba(255,255,255,0.16)'
-                      el.style.transform = 'translateY(-1px)'
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget
-                      el.style.background = 'linear-gradient(135deg, #E8322A 0%, #c42a22 100%)'
-                      el.style.boxShadow = '0 0 16px rgba(232,50,42,0.25), inset 0 1px 0 rgba(255,255,255,0.12)'
-                      el.style.transform = 'translateY(0)'
-                    }}
-                  >
-                    Creator
-                  </Link>
-                </>
+              {isSignedIn ? (
+                <UserButton afterSignOutUrl="/" />
+              ) : (
+                <Link
+                  to="/sign-in"
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    border: '1px solid rgba(240,237,232,0.15)',
+                    background: 'rgba(255,255,255,0.05)',
+                    color: 'rgba(240,237,232,0.7)',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  Sign In
+                </Link>
               )}
             </div>
           )}
@@ -327,28 +310,28 @@ export default function Nav() {
                 {label}
               </NavLink>
             ))}
-            {creatorAuthed && (
-              <>
-                <div style={{ height: 1, background: 'rgba(240,237,232,0.08)', margin: '8px 0 12px' }} />
+            <div style={{ marginTop: 8, paddingTop: 12, borderTop: '1px solid rgba(240,237,232,0.08)' }}>
+              {isSignedIn ? (
+                <div style={{ padding: '8px 14px' }}>
+                  <UserButton afterSignOutUrl="/" />
+                </div>
+              ) : (
                 <Link
-                  to="/creator"
+                  to="/sign-in"
                   style={{
                     display: 'block',
                     padding: '12px 14px',
                     borderRadius: 8,
                     fontSize: 16,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     textDecoration: 'none',
-                    color: '#E8322A',
-                    background: 'rgba(232,50,42,0.08)',
-                    border: '1px solid rgba(232,50,42,0.2)',
-                    textAlign: 'center',
+                    color: 'rgba(240,237,232,0.7)',
                   }}
                 >
-                  Creator ⚡
+                  Sign In
                 </Link>
-              </>
-            )}
+              )}
+            </div>
           </div>
         )}
       </nav>

@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
+import { useUser } from '@clerk/clerk-react'
 import { MOCK_LESSONS, MOCK_QUIZZES } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
+import { hasSubscription } from '@/lib/access'
+import PaywallBanner from '@/components/shared/PaywallBanner'
 import { Trophy, CheckCircle2, BookOpen, HelpCircle } from 'lucide-react'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import Icon from '@/components/shared/Icon'
@@ -11,6 +14,7 @@ type AnswerState = number | null
 export default function QuizPage() {
   const [loading, done] = usePageLoader(180)
   const { lessonSlug } = useParams<{ lessonSlug: string }>()
+  const { user } = useUser()
 
   const lesson = MOCK_LESSONS.find(l => l.slug === lessonSlug)
   const quiz = lesson ? MOCK_QUIZZES.find(q => q.lessonId === lesson.id) : undefined
@@ -26,6 +30,17 @@ export default function QuizPage() {
   const markCompleted = useAppStore(s => s.markCompleted)
 
   if (!lesson || !quiz) return <Navigate to="/lessons" replace />
+
+  if (!hasSubscription(user)) {
+    return (
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: 'clamp(40px, 6vw, 80px) 24px' }}>
+        <Link to={`/lessons/${lesson.slug}`} style={{ fontSize: 13, color: 'var(--text-tertiary)', textDecoration: 'none' }}>
+          ← {lesson.title}
+        </Link>
+        <PaywallBanner type="subscription" />
+      </div>
+    )
+  }
 
   if (loading) return (
     <PageLoader

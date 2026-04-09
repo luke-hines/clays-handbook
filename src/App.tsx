@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { SignIn, SignUp } from '@clerk/clerk-react'
 
 // Shared
 import Nav    from '@/components/shared/Nav'
@@ -19,10 +20,28 @@ import ToolsPage from '@/screens/ToolsPage'
 // Progress
 import ProgressPage from '@/screens/ProgressPage'
 
+// Pricing + auth
+import PricingPage from '@/screens/PricingPage'
+import SuccessPage from '@/screens/SuccessPage'
+
 // Creator screens
 import CreatorDashboard  from '@/screens/CreatorDashboard'
 import LessonGenerator   from '@/screens/LessonGenerator'
 import CreatorGate       from '@/components/shared/CreatorGate'
+
+function AuthPage({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '40px 24px',
+    }}>
+      {children}
+    </div>
+  )
+}
 
 export default function App() {
   return (
@@ -44,6 +63,28 @@ export default function App() {
 
           {/* Tools */}
           <Route path="/tools"                   element={<ToolsPage />} />
+
+          {/* Pricing + success */}
+          <Route path="/pricing"                 element={<PricingPage />} />
+          <Route path="/success"                 element={<SuccessPage />} />
+
+          {/* Auth */}
+          <Route
+            path="/sign-in/*"
+            element={
+              <AuthPage>
+                <SignIn routing="path" path="/sign-in" afterSignInUrl="/" />
+              </AuthPage>
+            }
+          />
+          <Route
+            path="/sign-up/*"
+            element={
+              <AuthPage>
+                <SignUp routing="path" path="/sign-up" afterSignUpUrl="/" />
+              </AuthPage>
+            }
+          />
 
           {/* Creator */}
           <Route path="/creator"          element={<CreatorGate><CreatorDashboard /></CreatorGate>} />

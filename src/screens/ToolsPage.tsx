@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import { useUser } from '@clerk/clerk-react'
 import { Calculator, Flag, Timer } from 'lucide-react'
+import { hasSubscription } from '@/lib/access'
+import PaywallBanner from '@/components/shared/PaywallBanner'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import { TRACKS, CAR_CLASSES, CONDITIONS } from '@/lib/toolsData'
 import {
@@ -714,8 +717,23 @@ function LapAnalyzer() {
 export default function ToolsPage() {
   const [loading, done] = usePageLoader(180)
   const [tab, setTab] = useState<Tab>('strategy')
+  const { user } = useUser()
 
   if (loading) return <PageLoader icon={<Calculator size={40} />} label="Racing Tools" color="#E8322A" duration={180} onDone={done} />
+
+  if (!hasSubscription(user)) {
+    return (
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(40px, 6vw, 80px) 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+          <span style={{ color: '#E8322A', display: 'flex' }}><Calculator size={28} /></span>
+          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: '-0.04em', color: 'var(--text)' }}>
+            Racing Tools
+          </h1>
+        </div>
+        <PaywallBanner type="subscription" />
+      </div>
+    )
+  }
   return (
     <div className="screen-enter" style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 24px 80px' }}>
       {/* Header */}

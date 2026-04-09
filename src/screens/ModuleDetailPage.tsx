@@ -1,7 +1,10 @@
 import { Link, useParams, Navigate } from 'react-router-dom'
+import { useUser } from '@clerk/clerk-react'
 import { LayoutGrid } from 'lucide-react'
 import { MOCK_MODULES, MOCK_LESSONS } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
+import { hasCourseAccess } from '@/lib/access'
+import PaywallBanner from '@/components/shared/PaywallBanner'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
@@ -10,6 +13,7 @@ export default function ModuleDetailPage() {
   const [loading, done] = usePageLoader(180)
   const { slug } = useParams<{ slug: string }>()
   const completedLessonIds = useAppStore(s => s.completedLessonIds)
+  const { user } = useUser()
 
   const mod = MOCK_MODULES.find(m => m.slug === slug)
   if (!mod) return <Navigate to="/modules" replace />
@@ -19,6 +23,23 @@ export default function ModuleDetailPage() {
   const progressPct = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0
 
   if (loading) return <PageLoader icon={<LayoutGrid size={40} />} label={mod.title} color={mod.color} duration={180} onDone={done} />
+
+  if (!hasCourseAccess(user)) {
+    return (
+      <div style={{ maxWidth: 820, margin: '0 auto', padding: 'clamp(40px, 6vw, 80px) 24px' }}>
+        <Link to="/modules" style={{ fontSize: 13, color: 'var(--text-tertiary)', textDecoration: 'none', display: 'inline-block', marginBottom: 20 }}>
+          ← Modules
+        </Link>
+        <h1 style={{ margin: '0 0 8px', fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>
+          {mod.title}
+        </h1>
+        <p style={{ margin: '0 0 0', fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          {mod.description}
+        </p>
+        <PaywallBanner type="course" />
+      </div>
+    )
+  }
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
