@@ -551,7 +551,7 @@ function VocabQuiz({ pool }: { pool: ConceptType[] }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function GlossaryPage() {
-  const [loading, done] = usePageLoader(360)
+  const [loading, done] = usePageLoader(180)
   const [search, setSearch] = useState('')
   const [pillar, setPillar] = useState<Pillar | 'all'>('all')
   const [pageMode, setPageMode] = useState<PageMode>('browse')
@@ -598,7 +598,7 @@ export default function GlossaryPage() {
     </button>
   )
 
-  if (loading) return <PageLoader icon={<Library size={40} />} label="Glossary" color="#4A9EDB" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<Library size={40} />} label="Glossary" color="#4A9EDB" duration={180} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

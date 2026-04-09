@@ -75,7 +75,7 @@ function ScoreBar({ score, color }: { score: number; color: string }) {
 }
 
 export default function ProgressPage() {
-  const [loading, done] = usePageLoader(320)
+  const [loading, done] = usePageLoader(180)
 
   const visitedLessonIds    = useAppStore(s => s.visitedLessonIds)
   const completedLessonIds  = useAppStore(s => s.completedLessonIds)
@@ -113,7 +113,7 @@ export default function ProgressPage() {
 
   const isEmpty = visitedCount === 0 && completedCount === 0 && scoreValues.length === 0
 
-  if (loading) return <PageLoader icon={<TrendingUp size={40} />} label="Progress" color="#C9A84C" duration={320} onDone={done} />
+  if (loading) return <PageLoader icon={<TrendingUp size={40} />} label="Progress" color="#C9A84C" duration={180} onDone={done} />
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>

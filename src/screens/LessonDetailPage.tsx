@@ -23,7 +23,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export default function LessonDetailPage() {
-  const [loading, done] = usePageLoader(400)
+  const [loading, done] = usePageLoader(180)
   const { slug } = useParams<{ slug: string }>()
   const [openConcept, setOpenConcept] = useState<Concept | null>(null)
   const videoUrls = useAppStore(s => s.videoUrls)
@@ -53,7 +53,7 @@ export default function LessonDetailPage() {
       icon={<Icon name={lesson.emoji} size={40} />}
       label={lesson.title}
       color={accentColor}
-      duration={400}
+      duration={180}
       onDone={done}
     />
   )

@@ -538,7 +538,7 @@ function VideoManagerRow({ lessonId, title, emoji }: { lessonId: string; title: 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 export default function CreatorDashboard() {
-  const [loading, done] = usePageLoader(360)
+  const [loading, done] = usePageLoader(180)
   const drafts = useAppStore(s => s.drafts)
   const publishedLessons = useAppStore(s => s.publishedLessons)
   const videoUrls = useAppStore(s => s.videoUrls)
@@ -568,7 +568,7 @@ export default function CreatorDashboard() {
     </button>
   )
 
-  if (loading) return <PageLoader icon={<PenLine size={40} />} label="Creator" color="#C9A84C" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<PenLine size={40} />} label="Creator" color="#C9A84C" duration={180} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

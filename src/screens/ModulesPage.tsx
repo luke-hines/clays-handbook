@@ -7,9 +7,9 @@ import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
 export default function ModulesPage() {
-  const [loading, done] = usePageLoader(360)
+  const [loading, done] = usePageLoader(180)
   const completedLessonIds = useAppStore(s => s.completedLessonIds)
-  if (loading) return <PageLoader icon={<LayoutGrid size={40} />} label="Modules" color="#C9A84C" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<LayoutGrid size={40} />} label="Modules" color="#C9A84C" duration={180} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* Header */}

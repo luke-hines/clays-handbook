@@ -90,7 +90,7 @@ function StatPanel() {
 }
 
 export default function HomePage() {
-  const [loading, done] = usePageLoader(380)
+  const [loading, done] = usePageLoader(180)
   const isMobile = useIsMobile()
   const visitedLessonIds = useAppStore(s => s.visitedLessonIds)
   const completedLessonIds = useAppStore(s => s.completedLessonIds)
@@ -102,7 +102,7 @@ export default function HomePage() {
     .map(id => MOCK_LESSONS.find(l => l.id === id))
     .filter(Boolean) as typeof MOCK_LESSONS
 
-  if (loading) return <PageLoader icon={<Flag size={44} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={620} onDone={done} />
+  if (loading) return <PageLoader icon={<Flag size={44} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={180} onDone={done} />
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>

@@ -100,7 +100,7 @@ function CopyButton({ text }: { text: string }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function LessonGenerator() {
-  const [loading, done] = usePageLoader(360)
+  const [loading, done] = usePageLoader(180)
   const navigate = useNavigate()
   const addDraft = useAppStore(s => s.addDraft)
 
@@ -177,7 +177,7 @@ export default function LessonGenerator() {
   const accentColor = pillar === 'racing' ? 'var(--red)' : 'var(--pillar-car)'
   const accentHex = pillar === 'racing' ? '#E8322A' : '#4A9EDB'
 
-  if (loading) return <PageLoader icon={<Wand2 size={40} />} label="Lesson Generator" color="#C9A84C" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<Wand2 size={40} />} label="Lesson Generator" color="#C9A84C" duration={180} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
       {/* ── Header ──────────────────────────────────────────────── */}

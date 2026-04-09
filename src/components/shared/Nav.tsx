@@ -69,7 +69,6 @@ export default function Nav() {
           borderBottom: `1px solid ${scrolled ? 'rgba(240,237,232,0.12)' : 'rgba(240,237,232,0.07)'}`,
           boxShadow: scrolled ? '0 4px 32px rgba(0,0,0,0.45)' : 'none',
           transition: 'background 0.3s, box-shadow 0.3s, border-color 0.3s',
-          position: 'relative',
         }}
         ref={menuRef}
       >

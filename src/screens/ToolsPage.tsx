@@ -712,10 +712,10 @@ function LapAnalyzer() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ToolsPage() {
-  const [loading, done] = usePageLoader(380)
+  const [loading, done] = usePageLoader(180)
   const [tab, setTab] = useState<Tab>('strategy')
 
-  if (loading) return <PageLoader icon={<Calculator size={40} />} label="Racing Tools" color="#E8322A" duration={380} onDone={done} />
+  if (loading) return <PageLoader icon={<Calculator size={40} />} label="Racing Tools" color="#E8322A" duration={180} onDone={done} />
   return (
     <div className="screen-enter" style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 24px 80px' }}>
       {/* Header */}

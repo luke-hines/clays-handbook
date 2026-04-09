@@ -9,7 +9,7 @@ import Icon from '@/components/shared/Icon'
 type AnswerState = number | null
 
 export default function QuizPage() {
-  const [loading, done] = usePageLoader(380)
+  const [loading, done] = usePageLoader(180)
   const { lessonSlug } = useParams<{ lessonSlug: string }>()
 
   const lesson = MOCK_LESSONS.find(l => l.slug === lessonSlug)
@@ -32,7 +32,7 @@ export default function QuizPage() {
       icon={lesson ? <Icon name={lesson.emoji} size={40} /> : <HelpCircle size={40} />}
       label={lesson ? `${lesson.title} — Quiz` : 'Quiz'}
       color={lesson?.pillar === 'racing' ? '#E8322A' : '#4A9EDB'}
-      duration={380}
+      duration={180}
       onDone={done}
     />
   )

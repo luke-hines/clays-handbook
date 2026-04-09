@@ -7,7 +7,7 @@ import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
 export default function ModuleDetailPage() {
-  const [loading, done] = usePageLoader(320)
+  const [loading, done] = usePageLoader(180)
   const { slug } = useParams<{ slug: string }>()
   const completedLessonIds = useAppStore(s => s.completedLessonIds)
 
@@ -18,7 +18,7 @@ export default function ModuleDetailPage() {
   const completedCount = lessons.filter(l => completedLessonIds.includes(l.id)).length
   const progressPct = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0
 
-  if (loading) return <PageLoader icon={<LayoutGrid size={40} />} label={mod.title} color={mod.color} duration={320} onDone={done} />
+  if (loading) return <PageLoader icon={<LayoutGrid size={40} />} label={mod.title} color={mod.color} duration={180} onDone={done} />
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>

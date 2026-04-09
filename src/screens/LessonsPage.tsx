@@ -128,7 +128,7 @@ function CatPill({
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function LessonsPage() {
-  const [loading, done] = usePageLoader(360)
+  const [loading, done] = usePageLoader(180)
   const [searchParams] = useSearchParams()
   const initialPillar = (searchParams.get('pillar') as Pillar | null) ?? 'all'
 
@@ -175,7 +175,7 @@ export default function LessonsPage() {
   const accentColor = pillar === 'racing' ? '#E8322A' : pillar === 'car' ? '#4A9EDB' : '#E8322A'
   const cats = pillar === 'car' ? CAR_CATS : RACING_CATS
 
-  if (loading) return <PageLoader icon={<BookOpen size={40} />} label="Lessons" color="#E8322A" duration={360} onDone={done} />
+  if (loading) return <PageLoader icon={<BookOpen size={40} />} label="Lessons" color="#E8322A" duration={180} onDone={done} />
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
