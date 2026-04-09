@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { Flag, ArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { MOCK_LESSONS, MOCK_MODULES } from '@/lib/mockData'
+import { useAppStore } from '@/lib/store'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
@@ -58,7 +60,7 @@ function StatPanel() {
             alignItems: 'center',
           }}
         >
-          <span style={{
+          <span className="stat-panel-number" style={{
             display: 'block',
             fontSize: 'clamp(52px, 6vw, 74px)',
             fontWeight: 800,
@@ -89,6 +91,17 @@ function StatPanel() {
 
 export default function HomePage() {
   const [loading, done] = usePageLoader(380)
+  const isMobile = useIsMobile()
+  const visitedLessonIds = useAppStore(s => s.visitedLessonIds)
+  const completedLessonIds = useAppStore(s => s.completedLessonIds)
+
+  // Up to 3 recently visited lessons not yet completed
+  const continueLessons = visitedLessonIds
+    .filter(id => !completedLessonIds.includes(id))
+    .slice(0, 3)
+    .map(id => MOCK_LESSONS.find(l => l.id === id))
+    .filter(Boolean) as typeof MOCK_LESSONS
+
   if (loading) return <PageLoader icon={<Flag size={44} fill="#E8322A" />} label="Clay's Handbook" color="#E8322A" duration={620} onDone={done} />
 
   return (
@@ -98,13 +111,13 @@ export default function HomePage() {
       <section style={{
         borderBottom: '1px solid var(--border)',
         background: 'linear-gradient(160deg, #111 0%, #0D0D0D 60%, #0a0810 100%)',
-        padding: '64px 24px',
+        padding: isMobile ? '40px 20px' : '64px 24px',
       }}>
         <div style={{
           maxWidth: 1120, margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 64,
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: isMobile ? 36 : 64,
           alignItems: 'center',
         }}>
 
@@ -173,14 +186,15 @@ export default function HomePage() {
 
       {/* ── Pillar split ──────────────────────────────────────────────────── */}
       <section style={{ borderBottom: '1px solid var(--border)' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
 
           {/* Racing */}
           <Link to="/lessons?pillar=racing" style={{ textDecoration: 'none' }}>
             <div
               style={{
-                padding: '36px 40px',
-                borderRight: '1px solid var(--border)',
+                padding: isMobile ? '28px 20px' : '36px 40px',
+                borderRight: isMobile ? 'none' : '1px solid var(--border)',
+                borderBottom: isMobile ? '1px solid var(--border)' : 'none',
                 cursor: 'pointer',
                 transition: 'background 0.2s',
                 position: 'relative',
@@ -227,7 +241,7 @@ export default function HomePage() {
           <Link to="/lessons?pillar=car" style={{ textDecoration: 'none' }}>
             <div
               style={{
-                padding: '36px 40px',
+                padding: isMobile ? '28px 20px' : '36px 40px',
                 cursor: 'pointer',
                 transition: 'background 0.2s',
                 position: 'relative',
@@ -273,8 +287,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Continue Learning ─────────────────────────────────────────────── */}
+      {continueLessons.length > 0 && (
+        <section style={{ padding: isMobile ? '32px 16px 0' : '40px 24px 0' }}>
+          <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div>
+                <p style={{ margin: '0 0 3px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                  Pick Up Where You Left Off
+                </p>
+                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text)' }}>
+                  Continue Learning
+                </h2>
+              </div>
+              <Link to="/lessons" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                All lessons <ArrowRight size={13} />
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
+              {continueLessons.map(lesson => (
+                <LessonCard key={lesson.id} lesson={lesson} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Featured Lessons ──────────────────────────────────────────────── */}
-      <section style={{ padding: '40px 24px 0' }}>
+      <section style={{ padding: isMobile ? '32px 16px 0' : '40px 24px 0' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
@@ -299,7 +339,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Modules ───────────────────────────────────────────────────────── */}
-      <section style={{ padding: '40px 24px 56px' }}>
+      <section style={{ padding: isMobile ? '32px 16px 48px' : '40px 24px 56px' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
             <div>
@@ -323,7 +363,7 @@ export default function HomePage() {
             {MOCK_MODULES.map(mod => {
               const count = MOCK_LESSONS.filter(l => mod.lessonIds.includes(l.id)).length
               return (
-                <Link key={mod.id} to="/modules" style={{ textDecoration: 'none' }}>
+                <Link key={mod.id} to={`/modules/${mod.slug}`} style={{ textDecoration: 'none' }}>
                   <div
                     style={{
                       padding: '18px 20px',

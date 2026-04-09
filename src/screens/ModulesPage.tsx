@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import { LayoutGrid } from 'lucide-react'
 import { MOCK_MODULES, MOCK_LESSONS } from '@/lib/mockData'
+import { useAppStore } from '@/lib/store'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
 export default function ModulesPage() {
   const [loading, done] = usePageLoader(360)
+  const completedLessonIds = useAppStore(s => s.completedLessonIds)
   if (loading) return <PageLoader icon={<LayoutGrid size={40} />} label="Modules" color="#C9A84C" duration={360} onDone={done} />
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
@@ -31,17 +33,19 @@ export default function ModulesPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', padding: 'clamp(24px, 4vw, 40px) clamp(16px, 4vw, 24px)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
           {MOCK_MODULES.map(mod => {
             const lessons = MOCK_LESSONS.filter(l => mod.lessonIds.includes(l.id))
+            const completedCount = lessons.filter(l => completedLessonIds.includes(l.id)).length
+            const progressPct = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0
             return (
               <section key={mod.id}>
                 {/* Module header */}
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     gap: 14,
                     marginBottom: 20,
                     paddingBottom: 18,
@@ -64,11 +68,16 @@ export default function ModulesPage() {
                   >
                     <Icon name={mod.emoji} size={24} />
                   </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}>
-                        {mod.title}
-                      </h2>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+                      <Link to={`/modules/${mod.slug}`} style={{ textDecoration: 'none' }}>
+                        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}
+                          onMouseEnter={e => { (e.target as HTMLElement).style.color = mod.color }}
+                          onMouseLeave={e => { (e.target as HTMLElement).style.color = 'var(--text)' }}
+                        >
+                          {mod.title}
+                        </h2>
+                      </Link>
                       <span
                         style={{
                           fontSize: 11,
@@ -82,10 +91,28 @@ export default function ModulesPage() {
                       >
                         {lessons.length} lessons
                       </span>
+                      {completedCount > 0 && (
+                        <span style={{
+                          fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 999,
+                          background: 'rgba(61,171,110,0.12)', color: '#3DAB6E', border: '1px solid rgba(61,171,110,0.3)',
+                        }}>
+                          {completedCount}/{lessons.length} done
+                        </span>
+                      )}
                     </div>
-                    <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)' }}>
+                    <p style={{ margin: '0 0 10px', fontSize: 14, color: 'var(--text-secondary)' }}>
                       {mod.description}
                     </p>
+                    {/* Progress bar */}
+                    <div style={{ height: 4, background: 'var(--surface-3)', borderRadius: 999, overflow: 'hidden', maxWidth: 240 }}>
+                      <div style={{
+                        height: '100%',
+                        borderRadius: 999,
+                        background: progressPct === 100 ? '#3DAB6E' : mod.color,
+                        width: `${progressPct}%`,
+                        transition: 'width 0.4s ease',
+                      }} />
+                    </div>
                   </div>
                 </div>
 

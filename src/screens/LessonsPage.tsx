@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { MOCK_LESSONS } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
 import LessonCard from '@/components/learner/LessonCard'
-import { Flag, Wrench, Search, BookOpen, X } from 'lucide-react'
+import { Flag, Wrench, Search, BookOpen, X, Bookmark } from 'lucide-react'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { Pillar, Difficulty, LessonCategory } from '@/types'
 
@@ -136,7 +136,9 @@ export default function LessonsPage() {
   const [difficulty, setDifficulty] = useState<Difficulty | 'all'>('all')
   const [category, setCategory] = useState<LessonCategory | 'all'>('all')
   const [search, setSearch] = useState('')
+  const [savedOnly, setSavedOnly] = useState(false)
   const publishedLessons = useAppStore(s => s.publishedLessons)
+  const bookmarkedLessonIds = useAppStore(s => s.bookmarkedLessonIds)
   const allLessons = useMemo(() => [...MOCK_LESSONS, ...publishedLessons], [publishedLessons])
 
   const handlePillarChange = (p: Pillar | 'all') => {
@@ -146,6 +148,7 @@ export default function LessonsPage() {
 
   const filtered = useMemo(() => {
     return allLessons.filter(l => {
+      if (savedOnly && !bookmarkedLessonIds.includes(l.id)) return false
       if (pillar !== 'all' && l.pillar !== pillar) return false
       if (difficulty !== 'all' && l.difficulty !== difficulty) return false
       if (category !== 'all' && l.category !== category) return false
@@ -159,15 +162,15 @@ export default function LessonsPage() {
       }
       return true
     })
-  }, [pillar, difficulty, category, search, allLessons])
+  }, [pillar, difficulty, category, search, savedOnly, allLessons, bookmarkedLessonIds])
 
   // Stats
   const racingCount = allLessons.filter(l => l.pillar === 'racing').length
   const carCount    = allLessons.filter(l => l.pillar === 'car').length
   const advCount    = allLessons.filter(l => l.difficulty === 'advanced').length
 
-  const isFiltered = pillar !== 'all' || difficulty !== 'all' || category !== 'all' || search !== ''
-  const clearAll   = () => { setPillar('all'); setDifficulty('all'); setCategory('all'); setSearch('') }
+  const isFiltered = pillar !== 'all' || difficulty !== 'all' || category !== 'all' || search !== '' || savedOnly
+  const clearAll   = () => { setPillar('all'); setDifficulty('all'); setCategory('all'); setSearch(''); setSavedOnly(false) }
 
   const accentColor = pillar === 'racing' ? '#E8322A' : pillar === 'car' ? '#4A9EDB' : '#E8322A'
   const cats = pillar === 'car' ? CAR_CATS : RACING_CATS
@@ -309,6 +312,43 @@ export default function LessonsPage() {
               value={difficulty}
               onChange={setDifficulty}
             />
+
+            <div style={{ width: 1, height: 24, background: 'var(--border)', flexShrink: 0 }} />
+
+            {/* Saved toggle */}
+            <button
+              onClick={() => setSavedOnly(s => !s)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '5px 12px',
+                borderRadius: 7,
+                fontSize: 12,
+                fontWeight: savedOnly ? 700 : 500,
+                border: savedOnly ? '1px solid rgba(201,168,76,0.4)' : '1px solid var(--border)',
+                background: savedOnly ? 'rgba(201,168,76,0.12)' : 'transparent',
+                color: savedOnly ? '#C9A84C' : 'var(--text-tertiary)',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Bookmark size={11} fill={savedOnly ? 'currentColor' : 'none'} />
+              Saved
+              {bookmarkedLessonIds.length > 0 && (
+                <span style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: '1px 5px',
+                  borderRadius: 999,
+                  background: savedOnly ? 'rgba(201,168,76,0.3)' : 'var(--surface-2)',
+                  color: savedOnly ? '#C9A84C' : 'var(--text-tertiary)',
+                }}>
+                  {bookmarkedLessonIds.length}
+                </span>
+              )}
+            </button>
 
             {isFiltered && (
               <>

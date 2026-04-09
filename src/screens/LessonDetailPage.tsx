@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { MOCK_LESSONS, MOCK_CONCEPTS, MOCK_QUIZZES } from '@/lib/mockData'
+import { MOCK_LESSONS, MOCK_CONCEPTS, MOCK_QUIZZES, MOCK_MODULES } from '@/lib/mockData'
 import { useAppStore } from '@/lib/store'
 import { parseVideoUrl } from '@/lib/videoUtils'
 import PillBadge from '@/components/shared/PillBadge'
@@ -11,6 +11,7 @@ import TrackDiagramView from '@/components/learner/TrackDiagram'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import { getDiagram } from '@/lib/diagramData'
+import { Bookmark } from 'lucide-react'
 import type { Concept } from '@/types'
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -27,9 +28,23 @@ export default function LessonDetailPage() {
   const [openConcept, setOpenConcept] = useState<Concept | null>(null)
   const videoUrls = useAppStore(s => s.videoUrls)
   const publishedLessons = useAppStore(s => s.publishedLessons)
+  const completedLessonIds = useAppStore(s => s.completedLessonIds)
+  const bookmarkedLessonIds = useAppStore(s => s.bookmarkedLessonIds)
+  const toggleBookmark = useAppStore(s => s.toggleBookmark)
+  const markVisited = useAppStore(s => s.markVisited)
+  const markCompleted = useAppStore(s => s.markCompleted)
+  const lessonNotes = useAppStore(s => s.lessonNotes)
+  const setLessonNote = useAppStore(s => s.setLessonNote)
+  const [noteSaved, setNoteSaved] = useState(false)
 
   const allLessons = [...MOCK_LESSONS, ...publishedLessons]
   const lesson = allLessons.find(l => l.slug === slug)
+
+  // Mark as visited when the lesson loads
+  useEffect(() => {
+    if (lesson) markVisited(lesson.id)
+  }, [lesson?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!lesson) return <Navigate to="/lessons" replace />
 
   const accentColor = lesson.pillar === 'racing' ? '#E8322A' : '#4A9EDB'
@@ -47,6 +62,22 @@ export default function LessonDetailPage() {
   const quiz = MOCK_QUIZZES.find(q => q.lessonId === lesson.id)
   const relatedLessons = allLessons.filter(l => lesson.relatedLessonIds.includes(l.id))
   const diagrams = lesson.diagramIds.map(id => getDiagram(id)).filter(Boolean) as NonNullable<ReturnType<typeof getDiagram>>[]
+
+  // Option D — fallback related lessons from same category
+  const effectiveRelatedLessons = useMemo(() => {
+    if (relatedLessons.length > 0) return relatedLessons
+    return allLessons.filter(l => l.id !== lesson.id && l.category === lesson.category).slice(0, 3)
+  }, [relatedLessons, allLessons, lesson.id, lesson.category])
+
+  // Option A — module prev/next navigation
+  const moduleNav = useMemo(() => {
+    const mod = MOCK_MODULES.find(m => m.lessonIds.includes(lesson.id))
+    if (!mod) return null
+    const idx = mod.lessonIds.indexOf(lesson.id)
+    const prevLesson = idx > 0 ? allLessons.find(l => l.id === mod.lessonIds[idx - 1]) ?? null : null
+    const nextLesson = idx < mod.lessonIds.length - 1 ? allLessons.find(l => l.id === mod.lessonIds[idx + 1]) ?? null : null
+    return { mod, prevLesson, nextLesson, isLast: idx === mod.lessonIds.length - 1 }
+  }, [lesson.id, allLessons])
 
   const rawVideoUrl = videoUrls[lesson.id] ?? lesson.videoUrl
   const embedUrl = rawVideoUrl ? parseVideoUrl(rawVideoUrl) : null
@@ -93,7 +124,7 @@ export default function LessonDetailPage() {
         </div>
 
         {/* ── Content ───────────────────────────────────────────── */}
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 64px' }}>
+        <div className="lesson-body-wrap" style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px 64px' }}>
           {/* Back link */}
           <div style={{ padding: '20px 0 0' }}>
             <Link
@@ -106,7 +137,7 @@ export default function LessonDetailPage() {
 
           {/* Title block */}
           <div style={{ marginTop: 20, marginBottom: 32 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <span style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -120,6 +151,31 @@ export default function LessonDetailPage() {
               }}>
                 <Icon name={lesson.emoji} size={26} />
               </span>
+              <button
+                onClick={() => toggleBookmark(lesson.id)}
+                title={bookmarkedLessonIds.includes(lesson.id) ? 'Remove bookmark' : 'Bookmark this lesson'}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '7px 14px',
+                  borderRadius: 8,
+                  border: bookmarkedLessonIds.includes(lesson.id)
+                    ? '1px solid rgba(201,168,76,0.4)'
+                    : '1px solid var(--border-strong)',
+                  background: bookmarkedLessonIds.includes(lesson.id)
+                    ? 'rgba(201,168,76,0.12)'
+                    : 'var(--surface-2)',
+                  color: bookmarkedLessonIds.includes(lesson.id) ? '#C9A84C' : 'var(--text-tertiary)',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  transition: 'all 0.15s',
+                }}
+              >
+                <Bookmark size={14} fill={bookmarkedLessonIds.includes(lesson.id) ? 'currentColor' : 'none'} />
+                {bookmarkedLessonIds.includes(lesson.id) ? 'Saved' : 'Save'}
+              </button>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
               <PillBadge pillar={lesson.pillar} />
@@ -268,6 +324,41 @@ export default function LessonDetailPage() {
             </ol>
           </div>
 
+          {/* ── Notes ────────────────────────────────────────── */}
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                Your Notes
+              </p>
+              {noteSaved && <span style={{ fontSize: 12, color: '#3DAB6E', fontWeight: 600 }}>Saved</span>}
+            </div>
+            <textarea
+              key={lesson.id}
+              defaultValue={lessonNotes[lesson.id] ?? ''}
+              onBlur={e => {
+                setLessonNote(lesson.id, e.target.value)
+                setNoteSaved(true)
+                setTimeout(() => setNoteSaved(false), 1500)
+              }}
+              placeholder="Your notes on this lesson..."
+              rows={4}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: 8,
+                border: '1px solid var(--border-strong)',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                fontSize: 14,
+                lineHeight: 1.6,
+                resize: 'vertical',
+                fontFamily: 'inherit',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
           {/* ── Body ──────────────────────────────────────────── */}
           {lesson.body ? (
             <div
@@ -383,9 +474,114 @@ export default function LessonDetailPage() {
             </div>
           )}
 
-          {/* ── Related Lessons ───────────────────────────────── */}
-          {relatedLessons.length > 0 && (
+          {/* ── Mark Complete ─────────────────────────────────── */}
+          <div style={{
+            padding: '18px 20px',
+            borderRadius: 10,
+            border: `1px solid ${completedLessonIds.includes(lesson.id) ? 'rgba(61,171,110,0.35)' : 'var(--border)'}`,
+            background: completedLessonIds.includes(lesson.id) ? 'rgba(61,171,110,0.06)' : 'var(--surface)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+          }}>
             <div>
+              <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
+                {completedLessonIds.includes(lesson.id) ? '✓ Lesson complete' : 'Done with this lesson?'}
+              </p>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
+                {completedLessonIds.includes(lesson.id)
+                  ? 'Marked as complete. It shows in your progress.'
+                  : 'Mark it complete to track your progress across modules.'}
+              </p>
+            </div>
+            {!completedLessonIds.includes(lesson.id) && (
+              <button
+                onClick={() => markCompleted(lesson.id)}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(61,171,110,0.5)',
+                  background: 'rgba(61,171,110,0.1)',
+                  color: '#3DAB6E',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(61,171,110,0.18)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(61,171,110,0.1)' }}
+              >
+                Mark Complete ✓
+              </button>
+            )}
+          </div>
+
+          {/* ── Module Navigation ─────────────────────────────── */}
+          {moduleNav && (
+            <div style={{ marginTop: 32 }}>
+              {moduleNav.isLast && completedLessonIds.includes(lesson.id) ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '24px',
+                  borderRadius: 12,
+                  background: 'rgba(61,171,110,0.06)',
+                  border: '1px solid rgba(61,171,110,0.2)',
+                }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700, color: '#3DAB6E' }}>Module Complete!</p>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>{moduleNav.mod.title}</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: 12 }}>
+                  {moduleNav.prevLesson ? (
+                    <Link
+                      to={`/lessons/${moduleNav.prevLesson.slug}`}
+                      style={{
+                        flex: 1,
+                        padding: '14px 16px',
+                        borderRadius: 10,
+                        border: '1px solid var(--border-strong)',
+                        background: 'var(--surface)',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>← Previous</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', lineHeight: 1.3 }}>{moduleNav.prevLesson.title}</span>
+                    </Link>
+                  ) : <div style={{ flex: 1 }} />}
+                  {moduleNav.nextLesson ? (
+                    <Link
+                      to={`/lessons/${moduleNav.nextLesson.slug}`}
+                      style={{
+                        flex: 1,
+                        padding: '14px 16px',
+                        borderRadius: 10,
+                        border: `1px solid ${accentColor}30`,
+                        background: `${accentColor}08`,
+                        textDecoration: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: 4,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: accentColor }}>Next →</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', lineHeight: 1.3, textAlign: 'right' }}>{moduleNav.nextLesson.title}</span>
+                    </Link>
+                  ) : <div style={{ flex: 1 }} />}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Related Lessons ───────────────────────────────── */}
+          {effectiveRelatedLessons.length > 0 && (
+            <div style={{ marginTop: 32 }}>
               <p
                 style={{
                   margin: '0 0 16px',
@@ -396,10 +592,10 @@ export default function LessonDetailPage() {
                   color: 'var(--text-tertiary)',
                 }}
               >
-                Related Lessons
+                {relatedLessons.length > 0 ? 'Related Lessons' : 'More in This Category'}
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 14 }}>
-                {relatedLessons.map(l => (
+                {effectiveRelatedLessons.map(l => (
                   <LessonCard key={l.id} lesson={l} />
                 ))}
               </div>

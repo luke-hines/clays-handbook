@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk'
 import type { Pillar, Difficulty, LessonCategory, QuizQuestion } from '@/types'
 
 export interface GenerateInput {
@@ -30,120 +31,87 @@ const PILLAR_CONTEXT: Record<Pillar, string> = {
   car: 'in terms of car setup and mechanics',
 }
 
-export function generateDraft(input: GenerateInput): GenerateOutput {
+export async function generateDraft(input: GenerateInput): Promise<GenerateOutput> {
   const { topic, pillar, category, difficulty, goal } = input
   const dl = DIFF_LABEL[difficulty]
   const ctx = PILLAR_CONTEXT[pillar]
   const t = topic.trim()
 
-  return {
-    generatedTitle: t,
-
-    generatedSummary:
-      `What ${t.toLowerCase()} actually means ${ctx}, and why it's a turning point for ${dl} drivers. ${goal}.`,
-
-    generatedTakeaways: [
-      `${t} is about [core principle] — not just [common misconception drivers have]`,
-      `The key variable is [X] — everything else follows from getting that right`,
-      `The most common mistake is [mistake] — and it's slower because [reason]`,
-      `In sim racing specifically, [sim-specific note] — the physics are honest`,
-      `Practice drill: [exercise] — three deliberate laps beats thirty accidental ones`,
-    ],
-
-    generatedBody: [
-      `## What is ${t}?`,
-      `${t} is one of those concepts that sounds straightforward but takes time to feel in the car. The principle is simple — the execution is where most ${dl} drivers leave time on the table.`,
-      `## Why it matters`,
-      `Understanding ${t.toLowerCase()} properly changes how you approach [specific situation]. This applies ${ctx}, and it's one of the highest-leverage areas you can work on at this stage.`,
-      `The reason it's so impactful is [mechanical/physics reason]. When you get it right, [positive outcome]. When you don't, [failure mode] — and most drivers don't notice they're doing it wrong.`,
-      `## The common mistakes`,
-      `Most ${dl} drivers approach this by [common incorrect approach]. The result is [negative consequence]. The fix isn't complex — it's [fix] — but it requires deliberate practice.`,
-      `## How to practice this`,
-      `Pick a single corner and work [specific element] for an entire session. Don't worry about lap time. Focus on [feel/data indicator]. After 10-15 minutes you'll feel the difference, and the lap time will follow.`,
-    ].join('\n\n'),
-
-    generatedGlossarySuggestions: [
-      t,
-      'Weight Transfer',
-      'Grip Limit',
-      pillar === 'racing' ? 'Apex' : 'Setup Balance',
-      pillar === 'racing' ? 'Trail Braking' : 'Brake Bias',
-    ],
-
-    generatedQuizQuestions: [
-      {
-        id: 'gen-q1',
-        question: `What is the primary purpose of ${t.toLowerCase()} in a ${pillar === 'racing' ? 'race scenario' : 'car setup context'}?`,
-        options: [
-          `[Correct answer — the actual purpose]`,
-          `[Common misconception — sounds plausible but wrong]`,
-          `[Partially correct — gets the surface right but misses the point]`,
-          `[Unrelated — plausible but clearly off-topic on reflection]`,
-        ],
-        correctIndex: 0,
-        explanation: `The correct answer is the first option because [reason tied directly to the concept]. Options B and C are common confusions — ${t.toLowerCase()} isn't about [misconception], it's about [core truth].`,
-      },
-      {
-        id: 'gen-q2',
-        question: `When ${t.toLowerCase()} is applied incorrectly, what is the most likely result?`,
-        options: [
-          `[Most likely failure outcome]`,
-          `[Secondary failure — also bad, but less direct]`,
-          `[No effect — wrong, but drivers sometimes assume this]`,
-          `[Counterintuitive outcome — sounds like it could be right]`,
-        ],
-        correctIndex: 0,
-        explanation: `The failure mode is [outcome] because [mechanical reason]. Recognizing this in the data or by feel is the first step to correcting it.`,
-      },
-    ] as QuizQuestion[],
-
-    generatedRecordingBrief: [
-      `**Topic:** ${t}`,
-      `**Pillar:** ${pillar === 'racing' ? 'Racing' : 'Car Knowledge'} — ${category}`,
-      `**Difficulty:** ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`,
-      `**Target runtime:** 6–10 minutes`,
-      `**Tone:** Direct, experienced. Paddock conversation — not a lecture.`,
-      ``,
-      `**Opening hook:** Start with the problem. What goes wrong when drivers don't understand this? Make them feel it before you explain it.`,
-      ``,
-      `**Suggested structure:**`,
-      `1. The problem / hook (60s)`,
-      `2. What ${t} actually is — one clear sentence (45s)`,
-      `3. Why it changes things — the physics or logic (90s)`,
-      `4. The common mistake and why it's slower (2min)`,
-      `5. The fix — concrete, actionable (2min)`,
-      `6. Practice drill — what to do next session (60s)`,
-      `7. Recap — three bullets (30s)`,
-      ``,
-      `**Things to avoid:** Don't be vague. Don't say "it depends" without following up. Don't assume they know [related concept] — link to the glossary instead.`,
-    ].join('\n'),
-
-    generatedScriptOutline: [
-      `**INTRO**`,
-      `"So ${t.toLowerCase()} — most ${dl} drivers have heard the term. But there's a gap between knowing what it is and actually using it. Today we're closing that gap."`,
-      ``,
-      `**SECTION 1 — The Core Concept**`,
-      `— Define it in one clean sentence`,
-      `— Contrast with what drivers assume it means`,
-      `— "Here's the simplest way to think about it..."`,
-      ``,
-      `**SECTION 2 — Why It Changes Your Lap**`,
-      `— The physics or mechanical reason (keep it brief)`,
-      `— What it feels like when you get it right`,
-      `— Data point or visual if recording a sim session`,
-      ``,
-      `**SECTION 3 — The Mistake**`,
-      `— Walk through what most ${dl} drivers do`,
-      `— Show or describe the result (lap time, feel, data)`,
-      `— "This is why you're losing [time/traction/whatever] — and you don't even know it"`,
-      ``,
-      `**SECTION 4 — The Fix**`,
-      `— Concrete technique or adjustment`,
-      `— Step by step if needed`,
-      `— One drill they can run next session`,
-      ``,
-      `**OUTRO**`,
-      `"Next time you're in the sim, pick one corner and work this deliberately. Three focused laps will teach you more than thirty where you're not thinking about it."`,
-    ].join('\n'),
+  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
+  if (!apiKey) {
+    throw new Error('VITE_ANTHROPIC_API_KEY is not set. Add it to your .env.local file.')
   }
+
+  const client = new Anthropic({
+    apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+
+  const prompt = `You are an expert content creator for Clay's Handbook — a racing and car knowledge education platform. The tone is direct, experienced, and honest — like paddock conversation between guys who actually know what they're talking about. Not a lecture. Not a blog. Functional and fast.
+
+Generate a complete lesson draft for this brief:
+
+Topic: ${t}
+Pillar: ${pillar === 'racing' ? 'Racing' : 'Car Knowledge'}
+Category: ${category}
+Difficulty: ${difficulty} (targeting ${dl} drivers/enthusiasts)
+Learning Goal: ${goal}
+Context: ${ctx}
+
+Return ONLY a valid JSON object. No markdown fences, no explanation before or after. Just the JSON.
+
+{
+  "generatedTitle": "string — sharp, specific lesson title",
+  "generatedSummary": "string — 1-2 sentences: what this delivers and why it matters for ${dl} drivers",
+  "generatedTakeaways": [
+    "string — specific, actionable takeaway (no placeholders)",
+    "string",
+    "string",
+    "string",
+    "string"
+  ],
+  "generatedBody": "string — full lesson body in markdown. Use ## headings for sections: What is [topic], Why it matters, The common mistakes, How to practice this. Write real content — no [placeholder] text. Be specific about ${t} ${ctx}.",
+  "generatedGlossarySuggestions": ["string", "string", "string", "string", "string"],
+  "generatedQuizQuestions": [
+    {
+      "id": "gen-q1",
+      "question": "string — specific question about ${t}",
+      "options": ["string — correct answer", "string — plausible wrong", "string — common misconception", "string — partially right but misses the point"],
+      "correctIndex": 0,
+      "explanation": "string — why option A is correct and where B/C go wrong"
+    },
+    {
+      "id": "gen-q2",
+      "question": "string — different angle on ${t}",
+      "options": ["string — correct answer", "string — plausible wrong", "string — common misconception", "string — partially right but misses the point"],
+      "correctIndex": 0,
+      "explanation": "string — clear, direct explanation"
+    }
+  ],
+  "generatedRecordingBrief": "string — multi-line recording brief with target runtime (6-10 min), tone notes, and a 7-part structure using \\n for newlines",
+  "generatedScriptOutline": "string — multi-line script outline: INTRO, SECTION 1-4, OUTRO using \\n for newlines"
+}
+
+Write actual content about ${t}. No placeholders, no brackets, no "e.g." — real substance that ${dl} drivers will find useful.`
+
+  const response = await client.messages.create({
+    model: 'claude-opus-4-6',
+    max_tokens: 4000,
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  const raw = response.content.find(b => b.type === 'text')?.text ?? ''
+
+  // Strip markdown fences if present
+  const stripped = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
+
+  // Extract JSON object
+  const jsonStart = stripped.indexOf('{')
+  const jsonEnd = stripped.lastIndexOf('}')
+  if (jsonStart === -1 || jsonEnd === -1) {
+    throw new Error('Claude did not return valid JSON. Try again.')
+  }
+
+  const parsed = JSON.parse(stripped.slice(jsonStart, jsonEnd + 1))
+  return parsed as GenerateOutput
 }

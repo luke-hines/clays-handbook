@@ -33,10 +33,55 @@ export const useAppStore = create<AppState>()(
           return { videoUrls: next }
         }),
 
+      // ── Learner progress ─────────────────────────────────────────────────────
+      visitedLessonIds: [],
+      completedLessonIds: [],
+      quizScores: {},
+
+      markVisited: (lessonId: string) =>
+        set((state) => ({
+          visitedLessonIds: state.visitedLessonIds.includes(lessonId)
+            ? state.visitedLessonIds
+            : [lessonId, ...state.visitedLessonIds],
+        })),
+
+      markCompleted: (lessonId: string) =>
+        set((state) => ({
+          completedLessonIds: state.completedLessonIds.includes(lessonId)
+            ? state.completedLessonIds
+            : [...state.completedLessonIds, lessonId],
+        })),
+
+      saveQuizScore: (lessonId: string, score: number) =>
+        set((state) => ({
+          quizScores: {
+            ...state.quizScores,
+            [lessonId]: Math.max(score, state.quizScores[lessonId] ?? 0),
+          },
+        })),
+
+      // ── Bookmarks ─────────────────────────────────────────────────────────────
+      bookmarkedLessonIds: [],
+
+      toggleBookmark: (lessonId: string) =>
+        set((state) => ({
+          bookmarkedLessonIds: state.bookmarkedLessonIds.includes(lessonId)
+            ? state.bookmarkedLessonIds.filter((id) => id !== lessonId)
+            : [...state.bookmarkedLessonIds, lessonId],
+        })),
+
+      // ── Lesson notes ──────────────────────────────────────────────────────────
+      lessonNotes: {},
+
+      setLessonNote: (lessonId: string, note: string) =>
+        set((state) => ({
+          lessonNotes: { ...state.lessonNotes, [lessonId]: note },
+        })),
+
       // ── Published lessons ─────────────────────────────────────────────────────
       publishedLessons: [],
 
-      publishDraft: (draftId: string) => {
+      publishDraft: (draftId: string, overrides?: { emoji?: string; conceptIds?: string[] }) => {
         const { drafts } = get()
         const draft = drafts.find((d) => d.id === draftId)
         if (!draft) return
@@ -57,8 +102,8 @@ export const useAppStore = create<AppState>()(
           keyTakeaways: draft.generatedTakeaways ?? [],
           body: draft.generatedBody ?? '',
           thumbnailColor: draft.pillar === 'racing' ? '#1a0a0a' : '#0a101a',
-          emoji: draft.pillar === 'racing' ? 'Flag' : 'Wrench',
-          conceptIds: [],
+          emoji: overrides?.emoji?.trim() || (draft.pillar === 'racing' ? 'Flag' : 'Wrench'),
+          conceptIds: overrides?.conceptIds ?? [],
           diagramIds: [],
           relatedLessonIds: [],
           publishedAt: new Date().toISOString(),

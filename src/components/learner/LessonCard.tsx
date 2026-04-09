@@ -4,7 +4,7 @@ import { useAppStore } from '@/lib/store'
 import PillBadge from '@/components/shared/PillBadge'
 import DifficultyBadge from '@/components/shared/DifficultyBadge'
 import Icon from '@/components/shared/Icon'
-import { Play, Clock } from 'lucide-react'
+import { Play, Clock, CheckCircle2, Bookmark } from 'lucide-react'
 
 interface Props {
   lesson: Lesson
@@ -29,7 +29,12 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function LessonCard({ lesson }: Props) {
   const videoUrls = useAppStore(s => s.videoUrls)
+  const completedLessonIds = useAppStore(s => s.completedLessonIds)
+  const bookmarkedLessonIds = useAppStore(s => s.bookmarkedLessonIds)
+  const toggleBookmark = useAppStore(s => s.toggleBookmark)
   const hasVideo = !!(videoUrls[lesson.id] ?? lesson.videoUrl)
+  const isCompleted = completedLessonIds.includes(lesson.id)
+  const isBookmarked = bookmarkedLessonIds.includes(lesson.id)
 
   return (
     <Link
@@ -122,6 +127,54 @@ export default function LessonCard({ lesson }: Props) {
               background: lesson.pillar === 'racing' ? 'var(--red)' : 'var(--pillar-car)',
             }}
           />
+
+          {/* Completed badge */}
+          {isCompleted && (
+            <span style={{
+              position: 'absolute',
+              bottom: 10,
+              right: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              padding: '3px 8px',
+              borderRadius: 999,
+              background: 'rgba(61,171,110,0.85)',
+              color: '#fff',
+              backdropFilter: 'blur(4px)',
+            }}>
+              <CheckCircle2 size={9} />
+              Done
+            </span>
+          )}
+
+          {/* Bookmark button */}
+          <button
+            onClick={e => { e.preventDefault(); e.stopPropagation(); toggleBookmark(lesson.id) }}
+            title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}
+            style={{
+              position: 'absolute',
+              bottom: isCompleted ? 10 : 8,
+              right: isCompleted ? 68 : 10,
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              border: 'none',
+              background: isBookmarked ? 'rgba(201,168,76,0.85)' : 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(4px)',
+              color: isBookmarked ? '#fff' : 'rgba(255,255,255,0.55)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background 0.15s, color 0.15s',
+            }}
+          >
+            <Bookmark size={13} fill={isBookmarked ? 'currentColor' : 'none'} />
+          </button>
         </div>
 
         {/* Content */}

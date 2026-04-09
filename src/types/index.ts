@@ -149,5 +149,21 @@ export interface AppState {
 
   // Published lessons (created from drafts)
   publishedLessons: Lesson[]
-  publishDraft: (draftId: string) => void
+  publishDraft: (draftId: string, overrides?: { emoji?: string; conceptIds?: string[] }) => void
+
+  // Learner progress
+  visitedLessonIds: string[]
+  completedLessonIds: string[]
+  quizScores: Record<string, number>   // lessonId → best score %
+  markVisited: (lessonId: string) => void
+  markCompleted: (lessonId: string) => void
+  saveQuizScore: (lessonId: string, score: number) => void
+
+  // Bookmarks
+  bookmarkedLessonIds: string[]
+  toggleBookmark: (lessonId: string) => void
+
+  // Lesson notes
+  lessonNotes: Record<string, string>
+  setLessonNote: (lessonId: string, note: string) => void
 }

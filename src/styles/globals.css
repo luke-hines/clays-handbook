@@ -255,4 +255,22 @@
   .screen-enter {
     animation: screen-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
+
+  /* ── Mobile utilities ── */
+  @media (max-width: 767px) {
+    /* Prevent horizontal overflow globally */
+    body, #root { overflow-x: hidden; }
+
+    /* LessonsPage search — stretch full width when wrapped */
+    .lessons-search { width: 100% !important; }
+
+    /* LessonDetailPage content — tighter padding */
+    .lesson-body-wrap { padding: 0 16px 48px !important; }
+
+    /* GlossaryPage — reduce padding */
+    .glossary-wrap { padding: 24px 16px !important; }
+
+    /* Reduce stat panel font on very small screens */
+    .stat-panel-number { font-size: 44px !important; }
+  }
 }

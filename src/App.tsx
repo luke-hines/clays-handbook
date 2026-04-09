@@ -10,10 +10,14 @@ import LessonsPage     from '@/screens/LessonsPage'
 import LessonDetailPage from '@/screens/LessonDetailPage'
 import GlossaryPage    from '@/screens/GlossaryPage'
 import ModulesPage     from '@/screens/ModulesPage'
+import ModuleDetailPage from '@/screens/ModuleDetailPage'
 import QuizPage        from '@/screens/QuizPage'
 
 // Tools
 import ToolsPage from '@/screens/ToolsPage'
+
+// Progress
+import ProgressPage from '@/screens/ProgressPage'
 
 // Creator screens
 import CreatorDashboard  from '@/screens/CreatorDashboard'
@@ -31,7 +35,11 @@ export default function App() {
           <Route path="/lessons/:slug"           element={<LessonDetailPage />} />
           <Route path="/glossary"                element={<GlossaryPage />} />
           <Route path="/modules"                 element={<ModulesPage />} />
+          <Route path="/modules/:slug"           element={<ModuleDetailPage />} />
           <Route path="/quiz/:lessonSlug"        element={<QuizPage />} />
+
+          {/* Progress */}
+          <Route path="/progress"                element={<ProgressPage />} />
 
           {/* Tools */}
           <Route path="/tools"                   element={<ToolsPage />} />

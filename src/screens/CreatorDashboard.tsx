@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { PenLine } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
 import { parseVideoUrl } from '@/lib/videoUtils'
-import { MOCK_LESSONS } from '@/lib/mockData'
+import { MOCK_LESSONS, MOCK_CONCEPTS } from '@/lib/mockData'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 import type { LessonDraft, DraftStatus } from '@/types'
 import PillBadge from '@/components/shared/PillBadge'
@@ -56,6 +56,9 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
   const [editing, setEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [confirmPublish, setConfirmPublish] = useState(false)
+  const [publishEmoji, setPublishEmoji] = useState(draft.pillar === 'racing' ? 'Flag' : 'Wrench')
+  const [publishConceptIds, setPublishConceptIds] = useState<string[]>([])
+  const [conceptSearch, setConceptSearch] = useState('')
   const { updateDraft, deleteDraft, publishDraft } = useAppStore()
 
   // Edit state mirrors draft fields
@@ -167,7 +170,7 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
             {/* Publish button */}
             {draft.status !== 'published' && !confirmPublish && (
               <button
-                onClick={() => setConfirmPublish(true)}
+                onClick={() => { setConfirmPublish(true); setExpanded(true) }}
                 style={{
                   padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 700,
                   border: '1px solid #3DAB6E', background: 'rgba(61,171,110,0.1)',
@@ -180,20 +183,12 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
               </button>
             )}
             {confirmPublish && (
-              <div style={{ display: 'flex', gap: 4 }}>
-                <button
-                  onClick={() => { publishDraft(draft.id); setConfirmPublish(false) }}
-                  style={{ padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 700, border: '1px solid #3DAB6E', background: 'rgba(61,171,110,0.15)', color: '#3DAB6E', cursor: 'pointer' }}
-                >
-                  Confirm
-                </button>
-                <button
-                  onClick={() => setConfirmPublish(false)}
-                  style={{ padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-              </div>
+              <button
+                onClick={() => setConfirmPublish(false)}
+                style={{ padding: '5px 10px', borderRadius: 6, fontSize: 12, fontWeight: 600, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
             )}
 
             {confirmDelete ? (
@@ -234,6 +229,96 @@ function DraftCard({ draft }: { draft: LessonDraft }) {
       {/* Expanded content */}
       {expanded && (
         <div style={{ borderTop: '1px solid var(--border)' }}>
+
+          {/* ── Publish Form ── */}
+          {confirmPublish && (
+            <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', background: 'rgba(61,171,110,0.04)' }}>
+              <p style={{ margin: '0 0 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#3DAB6E' }}>
+                Publish Options
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {/* Emoji */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>
+                    Lesson Emoji
+                  </label>
+                  <input
+                    type="text"
+                    value={publishEmoji}
+                    onChange={e => setPublishEmoji(e.target.value)}
+                    placeholder="e.g. Flag, Wrench, Zap"
+                    style={{ width: 200, padding: '7px 10px', borderRadius: 6, border: '1px solid var(--border-strong)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
+                  />
+                  <span style={{ marginLeft: 10, fontSize: 12, color: 'var(--text-tertiary)' }}>Lucide icon name (e.g. Flag, Wrench, Zap, Car)</span>
+                </div>
+                {/* Concept picker */}
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>
+                    Link Glossary Concepts
+                  </label>
+                  <input
+                    type="text"
+                    value={conceptSearch}
+                    onChange={e => setConceptSearch(e.target.value)}
+                    placeholder="Search concepts..."
+                    style={{ width: '100%', marginBottom: 8, padding: '7px 10px', borderRadius: 6, border: '1px solid var(--border-strong)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
+                  />
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, maxHeight: 120, overflowY: 'auto' }}>
+                    {MOCK_CONCEPTS
+                      .filter(c => !conceptSearch || c.title.toLowerCase().includes(conceptSearch.toLowerCase()))
+                      .map(concept => {
+                        const selected = publishConceptIds.includes(concept.id)
+                        return (
+                          <button
+                            key={concept.id}
+                            onClick={() => setPublishConceptIds(ids =>
+                              selected ? ids.filter(id => id !== concept.id) : [...ids, concept.id]
+                            )}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              border: selected ? '1px solid #3DAB6E' : '1px solid var(--border-strong)',
+                              background: selected ? 'rgba(61,171,110,0.12)' : 'var(--surface-2)',
+                              color: selected ? '#3DAB6E' : 'var(--text-secondary)',
+                              transition: 'all 0.1s',
+                            }}
+                          >
+                            {concept.title}
+                          </button>
+                        )
+                      })
+                    }
+                  </div>
+                  {publishConceptIds.length > 0 && (
+                    <p style={{ margin: '8px 0 0', fontSize: 12, color: '#3DAB6E' }}>
+                      {publishConceptIds.length} concept{publishConceptIds.length > 1 ? 's' : ''} linked
+                    </p>
+                  )}
+                </div>
+                {/* Confirm button */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={() => {
+                      publishDraft(draft.id, { emoji: publishEmoji, conceptIds: publishConceptIds })
+                      setConfirmPublish(false)
+                    }}
+                    style={{ padding: '8px 18px', borderRadius: 7, fontSize: 13, fontWeight: 700, border: '1px solid #3DAB6E', background: 'rgba(61,171,110,0.12)', color: '#3DAB6E', cursor: 'pointer' }}
+                  >
+                    Publish Lesson →
+                  </button>
+                  <button
+                    onClick={() => setConfirmPublish(false)}
+                    style={{ padding: '8px 14px', borderRadius: 7, fontSize: 13, fontWeight: 600, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Inline Edit Form ── */}
           {editing ? (

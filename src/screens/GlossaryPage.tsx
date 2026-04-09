@@ -688,7 +688,7 @@ export default function GlossaryPage() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '32px 24px' }}>
+      <div className="glossary-wrap" style={{ maxWidth: 1000, margin: '0 auto', padding: '32px 24px' }}>
         {pageMode === 'browse' && (
           <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
