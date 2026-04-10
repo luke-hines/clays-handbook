@@ -8,12 +8,12 @@ interface PaywallBannerProps {
 const COPY = {
   course: {
     headline: 'Full lesson access requires Course Access',
-    sub: 'One-time $97 — unlock all lessons and modules forever.',
+    sub: 'One-time $67.99 — unlock all lessons and modules forever.',
     cta: 'Get Course Access',
   },
   subscription: {
     headline: 'Quizzes and tools require a subscription',
-    sub: '$19/month — quizzes, racing tools, and the AI generator.',
+    sub: '$9.99/month — quizzes, racing tools, and the AI generator.',
     cta: 'Start Subscription',
   },
 }

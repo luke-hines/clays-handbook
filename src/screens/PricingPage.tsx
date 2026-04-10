@@ -5,9 +5,9 @@ const TIERS = [
   {
     id: 'course',
     label: 'Course Access',
-    price: '$97',
+    price: '$67.99',
     period: 'one-time',
-    description: 'Full access to all lessons and modules. Pay once, own it forever.',
+    description: 'Full access to all lessons and modules. Pay $67.99 once, own it forever.',
     features: [
       'All racing and car knowledge lessons',
       'Full lesson bodies and diagrams',
@@ -20,9 +20,9 @@ const TIERS = [
   {
     id: 'subscription',
     label: 'Monthly Subscription',
-    price: '$19',
+    price: '$9.99',
     period: '/month',
-    description: 'Everything in Course Access, plus quizzes, racing tools, and the AI generator.',
+    description: 'Everything in Course Access, plus quizzes, racing tools, and the AI generator. $9.99/month.',
     features: [
       'Everything in Course Access',
       'Quizzes for every lesson',
