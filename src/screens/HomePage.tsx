@@ -8,6 +8,31 @@ import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
+// ── Track curbs (fixed, hidden behind hero's solid bg via z-index) ────────────
+function Curbs() {
+  const bg = `repeating-linear-gradient(
+    180deg,
+    #C42820 0px,  #C42820 28px,
+    #EDE8DF 28px, #EDE8DF 56px
+  )`
+  const base: React.CSSProperties = {
+    position: 'fixed',
+    top: 58,   // start below nav
+    bottom: 0,
+    width: 28,
+    zIndex: 4, // hero section uses z-index 5, covering curbs while hero is on screen
+    pointerEvents: 'none',
+    background: bg,
+  }
+  return (
+    <>
+      <div style={{ ...base, left: 0, boxShadow: 'inset -4px 0 12px rgba(0,0,0,0.55)' }} />
+      <div style={{ ...base, right: 0, boxShadow: 'inset  4px 0 12px rgba(0,0,0,0.55)' }} />
+    </>
+  )
+}
+
+
 const featuredLessons = MOCK_LESSONS.filter(l => l.isFeatured)
 const racingLessons   = MOCK_LESSONS.filter(l => l.pillar === 'racing')
 const carLessons      = MOCK_LESSONS.filter(l => l.pillar === 'car')
@@ -94,7 +119,6 @@ export default function HomePage() {
   const isMobile = useIsMobile()
   const visitedLessonIds = useAppStore(s => s.visitedLessonIds)
   const completedLessonIds = useAppStore(s => s.completedLessonIds)
-
   // Up to 3 recently visited lessons not yet completed
   const continueLessons = visitedLessonIds
     .filter(id => !completedLessonIds.includes(id))
@@ -106,12 +130,15 @@ export default function HomePage() {
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
+      <Curbs />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section style={{
         borderBottom: '1px solid var(--border)',
         background: 'linear-gradient(160deg, #111 0%, #0D0D0D 60%, #0a0810 100%)',
         padding: isMobile ? '40px 20px' : '64px 24px',
+        position: 'relative',
+        zIndex: 5, // covers the fixed curbs while hero is on screen
       }}>
         <div style={{
           maxWidth: 1120, margin: '0 auto',
@@ -185,7 +212,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Pillar split ──────────────────────────────────────────────────── */}
-      <section style={{ borderBottom: '1px solid var(--border)' }}>
+      <section style={{ borderBottom: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr' }}>
 
           {/* Racing */}

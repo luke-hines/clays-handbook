@@ -11,10 +11,10 @@
     --gold-light:   rgba(201, 168, 76, 0.18);
 
     /* ── Surfaces ── */
-    --bg:           #0D0D0D;   /* near-black base */
-    --surface:      #161616;   /* card background */
-    --surface-2:    #1E1E1E;   /* elevated surface */
-    --surface-3:    #262626;   /* hover/active state */
+    --bg:           #24242A;   /* dark charcoal */
+    --surface:      #2E2E36;   /* card background */
+    --surface-2:    #383840;   /* elevated surface */
+    --surface-3:    #42424C;   /* hover/active state */
 
     /* ── Text ── */
     --text:         #F0EDE8;   /* off-white — primary */
@@ -22,8 +22,8 @@
     --text-tertiary:  rgba(240, 237, 232, 0.35);
 
     /* ── Borders ── */
-    --border:       rgba(240, 237, 232, 0.08);
-    --border-strong: rgba(240, 237, 232, 0.14);
+    --border:       rgba(240, 237, 232, 0.10);
+    --border-strong: rgba(240, 237, 232, 0.18);
 
     /* ── Difficulty ── */
     --diff-beginner:    #3DAB6E;   /* green */
@@ -46,6 +46,22 @@
 
   body {
     background-color: var(--bg);
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.055) 0px,
+        rgba(255,255,255,0.055) 1px,
+        transparent 1px,
+        transparent 4px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.055) 0px,
+        rgba(255,255,255,0.055) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+    background-size: 8px 8px;
     color: var(--text);
     font-family: 'Inter', 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
