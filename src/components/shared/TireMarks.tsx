@@ -4,10 +4,30 @@
  * Simulates the worn rubber deposits left by cars driving
  * the same corner lines lap after lap, as seen in aerial
  * photography of racing circuits. Two sweeping arc families
- * cross the viewport in an S-curve, each built from 5
- * parallel paths that blur together into a realistic groove.
+ * cross the viewport in an S-curve. Corner A has 9 tight
+ * parallel arcs (dense band = heavy traffic). Corner B has
+ * 6 arcs (lighter — this corner sees fewer laps).
  */
 export default function TireMarks() {
+  // Corner A center path — upper-left → lower-right
+  const cA = (dy: number) =>
+    `M -200,${144 + dy} C 350,${112 + dy} 718,${202 + dy} 928,${338 + dy} C 1138,${474 + dy} 1348,${634 + dy} 1638,${740 + dy}`
+
+  // Corner B center path — upper-right → lower-left
+  const cB = (dy: number) =>
+    `M 1640,${126 + dy} C 1278,${178 + dy} 976,${338 + dy} 776,${488 + dy} C 576,${638 + dy} 258,${748 + dy} -200,${830 + dy}`
+
+  // Corner A: 9 arcs at 14px spacing, centered at dy=0
+  //   offsets: -56 -42 -28 -14  0 +14 +28 +42 +56
+  const aOpacity = [0.16, 0.28, 0.40, 0.52, 0.64, 0.52, 0.40, 0.28, 0.16]
+  const aWidth   = [11,   12,   13,   14,   16,   14,   13,   12,   11  ]
+  const aOffsets = [-56, -42, -28, -14, 0, 14, 28, 42, 56]
+
+  // Corner B: 6 arcs at 14px spacing, centered at dy=0, lighter
+  const bOpacity = [0.13, 0.24, 0.36, 0.36, 0.24, 0.13]
+  const bWidth   = [11,   12,   14,   14,   12,   11  ]
+  const bOffsets = [-35, -21, -7, 7, 21, 35]
+
   return (
     <svg
       aria-hidden
@@ -23,11 +43,11 @@ export default function TireMarks() {
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
-        {/* Rubber grain: turbulence distorts path edges to look like real tire deposits */}
+        {/* Rubber grain — turbulence makes path edges look like real deposits */}
         <filter id="groove" x="-6%" y="-6%" width="112%" height="112%">
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.48 0.62"
+            baseFrequency="0.52 0.68"
             numOctaves="5"
             stitchTiles="stitch"
             result="noise"
@@ -35,38 +55,25 @@ export default function TireMarks() {
           <feDisplacementMap
             in="SourceGraphic"
             in2="noise"
-            scale="16"
+            scale="12"
             xChannelSelector="R"
             yChannelSelector="G"
             result="disp"
           />
-          <feGaussianBlur in="disp" stdDeviation="6" />
+          <feGaussianBlur in="disp" stdDeviation="4.5" />
         </filter>
 
-        {/* Softer outer-edge haze */}
+        {/* Wide soft haze behind groove band */}
         <filter id="haze" x="-10%" y="-10%" width="120%" height="120%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.32"
-            numOctaves="3"
-            stitchTiles="stitch"
-            result="noise"
-          />
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="noise"
-            scale="28"
-            result="disp"
-          />
-          <feGaussianBlur in="disp" stdDeviation="14" />
+          <feGaussianBlur stdDeviation="18" />
         </filter>
 
         {/* Corner A gradient: fades in from left, out to right */}
         <linearGradient id="gA" gradientUnits="userSpaceOnUse"
           x1="-200" y1="200" x2="1640" y2="750">
           <stop offset="0%"   stopColor="#000" stopOpacity="0" />
-          <stop offset="7%"   stopColor="#000" stopOpacity="1" />
-          <stop offset="93%"  stopColor="#000" stopOpacity="1" />
+          <stop offset="6%"   stopColor="#000" stopOpacity="1" />
+          <stop offset="94%"  stopColor="#000" stopOpacity="1" />
           <stop offset="100%" stopColor="#000" stopOpacity="0" />
         </linearGradient>
 
@@ -74,107 +81,60 @@ export default function TireMarks() {
         <linearGradient id="gB" gradientUnits="userSpaceOnUse"
           x1="1640" y1="150" x2="-200" y2="780">
           <stop offset="0%"   stopColor="#000" stopOpacity="0" />
-          <stop offset="7%"   stopColor="#000" stopOpacity="1" />
-          <stop offset="93%"  stopColor="#000" stopOpacity="1" />
+          <stop offset="6%"   stopColor="#000" stopOpacity="1" />
+          <stop offset="94%"  stopColor="#000" stopOpacity="1" />
           <stop offset="100%" stopColor="#000" stopOpacity="0" />
         </linearGradient>
       </defs>
 
-      {/*
-        ── Corner A: upper-left → lower-right ────────────────────────────────
-        Five parallel arcs 22px apart.
-        Arc 0 & 4 = groove edges (lightest).
-        Arc 2 = racing line (darkest — most rubber).
-      */}
+      {/* ── Corner A: upper-left → lower-right ─────────────────────────────── */}
 
-      {/* Outer haze */}
-      <g filter="url(#haze)" opacity="0.55">
+      {/* Broad outer haze */}
+      <g filter="url(#haze)" opacity="0.50">
         <path
-          d="M -200,130 C 350,95 720,185 930,320 C 1140,455 1350,615 1640,720"
-          fill="none" stroke="url(#gA)" strokeWidth="220" strokeLinecap="round"
+          d={cA(0)}
+          fill="none" stroke="url(#gA)" strokeWidth="280" strokeLinecap="round"
         />
       </g>
 
-      {/* Five-arc groove band */}
+      {/* 9-arc groove band */}
       <g filter="url(#groove)">
-        {/* arc 0 — outer edge */}
+        {aOffsets.map((dy, i) => (
+          <path
+            key={i}
+            d={cA(dy)}
+            fill="none"
+            stroke="url(#gA)"
+            strokeWidth={aWidth[i]}
+            strokeLinecap="round"
+            opacity={aOpacity[i]}
+          />
+        ))}
+      </g>
+
+      {/* ── Corner B: upper-right → lower-left ─────────────────────────────── */}
+
+      {/* Broad outer haze */}
+      <g filter="url(#haze)" opacity="0.38">
         <path
-          d="M -200,100 C 350,68 718,158 928,294 C 1138,430 1348,590 1638,696"
-          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.20"
-        />
-        {/* arc 1 */}
-        <path
-          d="M -200,122 C 350,90 718,180 928,316 C 1138,452 1348,612 1638,718"
-          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.36"
-        />
-        {/* arc 2 — racing line (center, darkest) */}
-        <path
-          d="M -200,144 C 350,112 718,202 928,338 C 1138,474 1348,634 1638,740"
-          fill="none" stroke="url(#gA)" strokeWidth="16" strokeLinecap="round"
-          opacity="0.52"
-        />
-        {/* arc 3 */}
-        <path
-          d="M -200,166 C 350,134 718,224 928,360 C 1138,496 1348,656 1638,762"
-          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.36"
-        />
-        {/* arc 4 — inner edge */}
-        <path
-          d="M -200,188 C 350,156 718,246 928,382 C 1138,518 1348,678 1638,784"
-          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.20"
+          d={cB(0)}
+          fill="none" stroke="url(#gB)" strokeWidth="240" strokeLinecap="round"
         />
       </g>
 
-      {/*
-        ── Corner B: upper-right → lower-left ────────────────────────────────
-        Crosses Corner A to create an S-curve track sequence.
-        Slightly lighter overall — this corner sees less traffic.
-      */}
-
-      {/* Outer haze */}
-      <g filter="url(#haze)" opacity="0.42">
-        <path
-          d="M 1640,110 C 1280,160 980,320 780,470 C 580,620 260,730 -200,810"
-          fill="none" stroke="url(#gB)" strokeWidth="200" strokeLinecap="round"
-        />
-      </g>
-
-      {/* Five-arc groove band */}
+      {/* 6-arc groove band */}
       <g filter="url(#groove)">
-        {/* arc 0 — outer edge */}
-        <path
-          d="M 1640,82 C 1278,134 976,294 776,444 C 576,594 258,704 -200,786"
-          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.16"
-        />
-        {/* arc 1 */}
-        <path
-          d="M 1640,104 C 1278,156 976,316 776,466 C 576,616 258,726 -200,808"
-          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.28"
-        />
-        {/* arc 2 — racing line */}
-        <path
-          d="M 1640,126 C 1278,178 976,338 776,488 C 576,638 258,748 -200,830"
-          fill="none" stroke="url(#gB)" strokeWidth="16" strokeLinecap="round"
-          opacity="0.42"
-        />
-        {/* arc 3 */}
-        <path
-          d="M 1640,148 C 1278,200 976,360 776,510 C 576,660 258,770 -200,852"
-          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.28"
-        />
-        {/* arc 4 — inner edge */}
-        <path
-          d="M 1640,170 C 1278,222 976,382 776,532 C 576,682 258,792 -200,874"
-          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
-          opacity="0.16"
-        />
+        {bOffsets.map((dy, i) => (
+          <path
+            key={i}
+            d={cB(dy)}
+            fill="none"
+            stroke="url(#gB)"
+            strokeWidth={bWidth[i]}
+            strokeLinecap="round"
+            opacity={bOpacity[i]}
+          />
+        ))}
       </g>
     </svg>
   )

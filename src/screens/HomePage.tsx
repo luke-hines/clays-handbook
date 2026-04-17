@@ -8,26 +8,37 @@ import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
-// ── Track kerbs (fixed, hidden behind hero's solid bg via z-index) ────────────
-// Square red/white block segments — like real flat kerb tiles on a racing circuit.
-function Curbs() {
-  const W = 54      // kerb width in px
-  const B = 54      // block height in px — square tiles
+// ── Tire wall barrier (fixed, stacked tires like at a real track) ─────────────
+// Each tile mimics a tire face seen end-on: hollow center void, rubber body,
+// slight top-left highlight for 3-D depth — tiled vertically down the sides.
+function TireWalls() {
+  const D = 68    // tire diameter in px
+  const W = 74    // panel width — slight extra padding each side
 
-  // Base red/white blocks
-  const blocks = `repeating-linear-gradient(
-    180deg,
-    #C22820 0px,       #C22820 ${B}px,
-    #F0EBE3 ${B}px,    #F0EBE3 ${B * 2}px
-  )`
+  // Tire face cross-section: center hole → inner liner → rubber body → outer edge
+  const tire = [
+    `radial-gradient(circle at 50% 50%,`,
+    `  #080808  0px,  #080808  17px,`,   // center void
+    `  #1a1a1a  18px, #222222  26px,`,   // inner liner (lighter ring)
+    `  #181818  26px, #111111  32px,`,   // rubber shoulder
+    `  #080808  33px, transparent 34px`, // outer tread edge
+    `)`,
+  ].join('\n')
 
-  // Thin dark seam lines at each block boundary
-  const seams = `repeating-linear-gradient(
+  // Subtle top-left gloss — gives slight convex feel
+  const gloss = [
+    `radial-gradient(circle at 38% 32%,`,
+    `  rgba(255,255,255,0.10)  0px,`,
+    `  rgba(255,255,255,0.04)  8px,`,
+    `  transparent            14px`,
+    `)`,
+  ].join('\n')
+
+  // Between-tire mortar: dark gap rows
+  const gap = `repeating-linear-gradient(
     180deg,
-    rgba(0,0,0,0.45) 0px,        rgba(0,0,0,0.45) 2px,
-    transparent 2px,             transparent ${B}px,
-    rgba(0,0,0,0.45) ${B}px,     rgba(0,0,0,0.45) ${B + 2}px,
-    transparent ${B + 2}px,      transparent ${B * 2}px
+    rgba(0,0,0,0.70)  0px, rgba(0,0,0,0.70)  3px,
+    transparent       3px, transparent       ${D}px
   )`
 
   const base: React.CSSProperties = {
@@ -37,20 +48,22 @@ function Curbs() {
     width: W,
     zIndex: 4,
     pointerEvents: 'none',
-    backgroundImage: `${seams}, ${blocks}`,
+    backgroundColor: '#090909',
+    backgroundImage: `${gloss}, ${tire}, ${gap}`,
+    backgroundSize: `${D}px ${D}px`,
+    backgroundPosition: `${(W - D) / 2}px 0px`,
+    backgroundRepeat: 'repeat-y',
   }
 
   return (
     <>
-      {/* Left kerb — inner shadow fades into track */}
       <div style={{
         ...base, left: 0,
-        boxShadow: 'inset -6px 0 0 rgba(0,0,0,0.25), inset -14px 0 28px rgba(0,0,0,0.55)',
+        boxShadow: 'inset -8px 0 20px rgba(0,0,0,0.70), 4px 0 12px rgba(0,0,0,0.55)',
       }} />
-      {/* Right kerb */}
       <div style={{
         ...base, right: 0,
-        boxShadow: 'inset  6px 0 0 rgba(0,0,0,0.25), inset  14px 0 28px rgba(0,0,0,0.55)',
+        boxShadow: 'inset  8px 0 20px rgba(0,0,0,0.70), -4px 0 12px rgba(0,0,0,0.55)',
       }} />
     </>
   )
@@ -154,7 +167,7 @@ export default function HomePage() {
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
-      <Curbs />
+      <TireWalls />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section style={{
