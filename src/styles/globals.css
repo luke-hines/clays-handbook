@@ -46,29 +46,6 @@
 
   body {
     background-color: #0a0a0e;
-    /*
-      Real aerial photo of Circuit de Spa-Francorchamps (CC BY-SA 4.0, Planet Labs)
-      darkened with two overlays:
-        1. Colour-grade: tint toward the site's dark-blue-grey palette
-        2. Vignette: fade edges to near-black so content panels sit cleanly
-      The photo provides real asphalt texture, actual rubber groove marks,
-      and genuine kerb colours — nothing CSS can fake.
-    */
-    background-image:
-      radial-gradient(ellipse 90% 75% at 50% 45%,
-        transparent 30%,
-        rgba(10, 10, 14, 0.55) 65%,
-        rgba(10, 10, 14, 0.92) 100%
-      ),
-      linear-gradient(
-        rgba(18, 18, 26, 0.62),
-        rgba(18, 18, 26, 0.62)
-      ),
-      url('/track-bg.jpg');
-    background-size: cover;
-    background-position: center 38%;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
     color: var(--text);
     font-family: 'Inter', 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;

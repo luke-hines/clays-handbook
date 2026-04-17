@@ -2,8 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { SignIn, SignUp } from '@clerk/clerk-react'
 
 // Shared
-import Nav    from '@/components/shared/Nav'
-import Footer from '@/components/shared/Footer'
+import Nav              from '@/components/shared/Nav'
+import Footer           from '@/components/shared/Footer'
+import TrackBackground  from '@/components/shared/TrackBackground'
 
 // Learner screens
 import HomePage        from '@/screens/HomePage'
@@ -46,6 +47,7 @@ function AuthPage({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <>
+      <TrackBackground />
       <Nav />
       <main style={{ flex: 1, position: 'relative', zIndex: 2 }}>
         <Routes>
