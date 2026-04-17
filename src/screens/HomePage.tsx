@@ -22,45 +22,40 @@ function TireWalls() {
   const VIEW_H = 1100
   const ROWS = Math.ceil(VIEW_H / D) + 2
 
-  // Slight brightness variation to simulate tyres installed at different times
-  const BRIGHT = [1.00, 0.88, 1.06, 0.82, 0.96, 1.10, 0.90]
+  // Brightness variation — simulates tyres from different batches / ages
+  // Values are much more spread so zone rings are clearly visible
+  const BRIGHT = [1.00, 0.84, 1.12, 0.78, 1.04, 0.90, 1.08]
 
   const tireFace = (row: number) => {
-    const cy  = row * D + D / 2
-    const b   = BRIGHT[row % BRIGHT.length]
-    const g   = (base: number) => {
+    const cy = row * D + D / 2
+    const b  = BRIGHT[row % BRIGHT.length]
+    const g  = (base: number) => {
       const v = Math.round(Math.min(255, base * b))
       return `rgb(${v},${v},${v})`
     }
     return (
       <g key={row}>
-        {/* 1 — outer bead seat / rim flange */}
-        <circle cx={CX} cy={cy} r={R}          fill={g(16)} />
-        {/* 2 — sidewall rubber (main visible area) */}
-        <circle cx={CX} cy={cy} r={R * 0.90}   fill={g(12)} />
-        {/* 3 — tread-to-sidewall shoulder step */}
-        <circle cx={CX} cy={cy} r={R * 0.80}   fill={g(9)}  />
-        {/* 4 — inner shoulder groove (slightly recessed) */}
-        <circle cx={CX} cy={cy} r={R * 0.70}   fill={g(7)}  />
-        {/* 5 — bead ring (prominent lighter band) */}
-        <circle cx={CX} cy={cy} r={R * 0.60}   fill={g(22)} />
-        {/* 6 — bead flange drop */}
-        <circle cx={CX} cy={cy} r={R * 0.53}   fill={g(17)} />
+        {/* 1 — outer bead seat edge */}
+        <circle cx={CX} cy={cy} r={R}         fill={g(32)} />
+        {/* 2 — sidewall rubber body */}
+        <circle cx={CX} cy={cy} r={R * 0.89}  fill={g(20)} />
+        {/* 3 — shoulder groove (recessed step) */}
+        <circle cx={CX} cy={cy} r={R * 0.78}  fill={g(14)} />
+        {/* 4 — inner sidewall */}
+        <circle cx={CX} cy={cy} r={R * 0.68}  fill={g(10)} />
+        {/* 5 — bead ring: prominently lighter — most visible landmark */}
+        <circle cx={CX} cy={cy} r={R * 0.60}  fill={g(52)} />
+        {/* 6 — bead flange step-down */}
+        <circle cx={CX} cy={cy} r={R * 0.52}  fill={g(36)} />
         {/* 7 — inner liner */}
-        <circle cx={CX} cy={cy} r={R * 0.46}   fill={g(13)} />
-        {/* 8 — center void (hollow) */}
-        <circle cx={CX} cy={cy} r={R * 0.23}   fill={g(4)}  />
-        {/* Top-left specular highlight — convex rubber surface */}
+        <circle cx={CX} cy={cy} r={R * 0.44}  fill={g(22)} />
+        {/* 8 — center void */}
+        <circle cx={CX} cy={cy} r={R * 0.22}  fill={g(5)}  />
+        {/* Top-left specular gloss */}
         <ellipse
-          cx={CX - R * 0.23} cy={cy - R * 0.20}
-          rx={R * 0.33} ry={R * 0.24}
-          fill="rgba(255,255,255,0.058)"
-        />
-        {/* Faint secondary gloss lower-right */}
-        <ellipse
-          cx={CX + R * 0.20} cy={cy + R * 0.17}
-          rx={R * 0.16} ry={R * 0.12}
-          fill="rgba(255,255,255,0.018)"
+          cx={CX - R * 0.22} cy={cy - R * 0.19}
+          rx={R * 0.30} ry={R * 0.22}
+          fill="rgba(255,255,255,0.07)"
         />
       </g>
     )
