@@ -8,116 +8,6 @@ import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
-// ── Tire wall barrier ────────────────────────────────────────────────────────
-function TireWalls() {
-  const D      = 84    // tire outer diameter
-  const GAP    = 5     // dark gap between tires
-  const R      = (D - GAP) / 2   // ~39.5
-  const W      = 96    // panel width
-  const CX     = W / 2
-  const VIEW_H = 1200
-  const ROWS   = Math.ceil(VIEW_H / D) + 2
-
-  // Age/wear variation — spread wide so tires are visually distinct rows
-  const BRIGHT = [1.00, 0.82, 1.14, 0.76, 1.08, 0.88, 1.18, 0.70, 0.96]
-
-  const tireFace = (row: number) => {
-    const cy = row * D + D / 2
-    const b  = BRIGHT[row % BRIGHT.length]
-    const v  = (base: number) => Math.round(Math.min(255, base * b))
-    const g  = (base: number) => `rgb(${v(base)},${v(base)},${v(base)})`
-
-    return (
-      <g key={row}>
-        {/* Outer rim edge — slightly lighter than sidewall (catches ambient light) */}
-        <circle cx={CX} cy={cy} r={R}          fill={g(58)}  />
-        {/* Sidewall rubber — main dark body */}
-        <circle cx={CX} cy={cy} r={R * 0.88}   fill={g(36)}  />
-        {/* Tread-shoulder step — recessed darker groove */}
-        <circle cx={CX} cy={cy} r={R * 0.77}   fill={g(22)}  />
-        {/* Inner sidewall */}
-        <circle cx={CX} cy={cy} r={R * 0.67}   fill={g(16)}  />
-        {/* Bead ring — the brightest landmark, clearly visible as a ring */}
-        <circle cx={CX} cy={cy} r={R * 0.60}   fill={g(108)} />
-        {/* Bead flange drop-off */}
-        <circle cx={CX} cy={cy} r={R * 0.52}   fill={g(72)}  />
-        {/* Inner liner — smooth rubber inside */}
-        <circle cx={CX} cy={cy} r={R * 0.44}   fill={g(46)}  />
-        {/* Center void — the hollow hole */}
-        <circle cx={CX} cy={cy} r={R * 0.23}   fill={g(8)}   />
-        {/* Top-left specular — convex rubber catches overhead light */}
-        <ellipse
-          cx={CX - R * 0.20} cy={cy - R * 0.18}
-          rx={R * 0.28}       ry={R * 0.20}
-          fill="rgba(255,255,255,0.09)"
-        />
-        {/* Faint bottom-right counter-highlight */}
-        <ellipse
-          cx={CX + R * 0.22} cy={cy + R * 0.20}
-          rx={R * 0.14}       ry={R * 0.10}
-          fill="rgba(255,255,255,0.022)"
-        />
-      </g>
-    )
-  }
-
-  const wall = (isLeft: boolean) => {
-    const sid = `twSh${isLeft ? 'L' : 'R'}`
-    // Shadow sits on the INWARD (track-facing) edge:
-    //   left wall  → shadow on right side  (x: transparent→dark, left→right)
-    //   right wall → shadow on left side   (x: dark→transparent, left→right)
-    return (
-      <svg
-        aria-hidden
-        key={isLeft ? 'L' : 'R'}
-        style={{
-          position: 'fixed',
-          top: 58,
-          bottom: 0,
-          [isLeft ? 'left' : 'right']: 0,
-          width: W,
-          zIndex: 4,
-          pointerEvents: 'none',
-          overflow: 'hidden',
-        }}
-        viewBox={`0 0 ${W} ${VIEW_H}`}
-        preserveAspectRatio="xMidYMin slice"
-      >
-        <defs>
-          <linearGradient id={sid} x1="0%" x2="100%" y1="0%" y2="0%">
-            {isLeft ? (
-              /* Left wall: transparent on left (outer), dark on right (track-facing) */
-              <>
-                <stop offset="0%"   stopColor="#000" stopOpacity="0"    />
-                <stop offset="50%"  stopColor="#000" stopOpacity="0.18" />
-                <stop offset="100%" stopColor="#000" stopOpacity="0.72" />
-              </>
-            ) : (
-              /* Right wall: dark on left (track-facing), transparent on right (outer) */
-              <>
-                <stop offset="0%"   stopColor="#000" stopOpacity="0.72" />
-                <stop offset="50%"  stopColor="#000" stopOpacity="0.18" />
-                <stop offset="100%" stopColor="#000" stopOpacity="0"    />
-              </>
-            )}
-          </linearGradient>
-        </defs>
-
-        {/* Background — the dark gap colour between tires */}
-        <rect width={W} height={VIEW_H} fill="#050505" />
-
-        {/* Tire faces */}
-        {Array.from({ length: ROWS }, (_, i) => tireFace(i))}
-
-        {/* Shadow overlay: darkens the track-facing edge for depth */}
-        <rect width={W} height={VIEW_H} fill={`url(#${sid})`} />
-      </svg>
-    )
-  }
-
-  return <>{wall(true)}{wall(false)}</>
-}
-
 
 const featuredLessons = MOCK_LESSONS.filter(l => l.isFeatured)
 const racingLessons   = MOCK_LESSONS.filter(l => l.pillar === 'racing')
@@ -216,7 +106,6 @@ export default function HomePage() {
 
   return (
     <div className="screen-enter" style={{ minHeight: '100vh' }}>
-      <TireWalls />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section style={{
