@@ -1,7 +1,11 @@
 /**
- * Realistic tire mark overlay — fixed behind all content.
- * Uses SVG paths with turbulence displacement + gaussian blur to simulate
- * rubber deposit texture. Pairs of parallel lines = two tires of one car.
+ * Rubber groove overlay — fixed behind all content.
+ *
+ * Simulates the worn rubber deposits left by cars driving
+ * the same corner lines lap after lap, as seen in aerial
+ * photography of racing circuits. Two sweeping arc families
+ * cross the viewport in an S-curve, each built from 5
+ * parallel paths that blur together into a realistic groove.
  */
 export default function TireMarks() {
   return (
@@ -19,146 +23,157 @@ export default function TireMarks() {
       preserveAspectRatio="xMidYMid slice"
     >
       <defs>
-        {/* Rubber texture: turbulence displacement + soft blur gives organic edges */}
-        <filter id="rubber" x="-5%" y="-5%" width="110%" height="110%">
+        {/* Rubber grain: turbulence distorts path edges to look like real tire deposits */}
+        <filter id="groove" x="-6%" y="-6%" width="112%" height="112%">
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="0.7"
-            numOctaves="4"
+            baseFrequency="0.48 0.62"
+            numOctaves="5"
             stitchTiles="stitch"
             result="noise"
           />
           <feDisplacementMap
             in="SourceGraphic"
             in2="noise"
-            scale="5"
+            scale="16"
             xChannelSelector="R"
             yChannelSelector="G"
-            result="displaced"
+            result="disp"
           />
-          <feGaussianBlur in="displaced" stdDeviation="1.2" />
+          <feGaussianBlur in="disp" stdDeviation="6" />
         </filter>
 
-        {/* — Gradients: fade each mark at both ends — */}
+        {/* Softer outer-edge haze */}
+        <filter id="haze" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.32"
+            numOctaves="3"
+            stitchTiles="stitch"
+            result="noise"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale="28"
+            result="disp"
+          />
+          <feGaussianBlur in="disp" stdDeviation="14" />
+        </filter>
 
-        {/* Braking mark A: left-to-right fade */}
-        <linearGradient id="gA" gradientUnits="userSpaceOnUse" x1="160" y1="590" x2="840" y2="650">
+        {/* Corner A gradient: fades in from left, out to right */}
+        <linearGradient id="gA" gradientUnits="userSpaceOnUse"
+          x1="-200" y1="200" x2="1640" y2="750">
           <stop offset="0%"   stopColor="#000" stopOpacity="0" />
-          <stop offset="12%"  stopColor="#000" stopOpacity="0.35" />
-          <stop offset="65%"  stopColor="#000" stopOpacity="0.28" />
+          <stop offset="7%"   stopColor="#000" stopOpacity="1" />
+          <stop offset="93%"  stopColor="#000" stopOpacity="1" />
           <stop offset="100%" stopColor="#000" stopOpacity="0" />
         </linearGradient>
 
-        {/* Corner exit arc B: top-left diagonal fade */}
-        <linearGradient id="gB" gradientUnits="userSpaceOnUse" x1="1050" y1="500" x2="1400" y2="840">
+        {/* Corner B gradient: fades in from right, out to left */}
+        <linearGradient id="gB" gradientUnits="userSpaceOnUse"
+          x1="1640" y1="150" x2="-200" y2="780">
           <stop offset="0%"   stopColor="#000" stopOpacity="0" />
-          <stop offset="18%"  stopColor="#000" stopOpacity="0.32" />
-          <stop offset="70%"  stopColor="#000" stopOpacity="0.24" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0.06" />
-        </linearGradient>
-
-        {/* Spin marks C: bottom-up fade */}
-        <linearGradient id="gC" gradientUnits="userSpaceOnUse" x1="530" y1="880" x2="545" y2="650">
-          <stop offset="0%"   stopColor="#000" stopOpacity="0.35" />
-          <stop offset="55%"  stopColor="#000" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0" />
-        </linearGradient>
-
-        {/* Long braking mark D: left-to-right */}
-        <linearGradient id="gD" gradientUnits="userSpaceOnUse" x1="190" y1="285" x2="1120" y2="255">
-          <stop offset="0%"   stopColor="#000" stopOpacity="0" />
-          <stop offset="8%"   stopColor="#000" stopOpacity="0.28" />
-          <stop offset="60%"  stopColor="#000" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0" />
-        </linearGradient>
-
-        {/* Late-apex flick E: diagonal */}
-        <linearGradient id="gE" gradientUnits="userSpaceOnUse" x1="60" y1="720" x2="420" y2="440">
-          <stop offset="0%"   stopColor="#000" stopOpacity="0.3" />
-          <stop offset="50%"  stopColor="#000" stopOpacity="0.2" />
+          <stop offset="7%"   stopColor="#000" stopOpacity="1" />
+          <stop offset="93%"  stopColor="#000" stopOpacity="1" />
           <stop offset="100%" stopColor="#000" stopOpacity="0" />
         </linearGradient>
       </defs>
 
-      {/* ── Mark A: Hard braking streak, centre-left, slight diagonal ──────── */}
-      {/* Realistic: patchy deposits (dasharray), parallel twin tracks          */}
-      <g filter="url(#rubber)" opacity="0.95">
+      {/*
+        ── Corner A: upper-left → lower-right ────────────────────────────────
+        Five parallel arcs 22px apart.
+        Arc 0 & 4 = groove edges (lightest).
+        Arc 2 = racing line (darkest — most rubber).
+      */}
+
+      {/* Outer haze */}
+      <g filter="url(#haze)" opacity="0.55">
         <path
-          d="M 160,583 C 360,590 580,608 845,648"
-          fill="none" stroke="url(#gA)" strokeWidth="12" strokeLinecap="round"
-          strokeDasharray="310 7 180 5 220 4 90"
-        />
-        <path
-          d="M 162,601 C 362,608 582,626 847,666"
-          fill="none" stroke="url(#gA)" strokeWidth="10" strokeLinecap="round"
-          strokeDasharray="270 9 200 6 160 5 110"
+          d="M -200,130 C 350,95 720,185 930,320 C 1140,455 1350,615 1640,720"
+          fill="none" stroke="url(#gA)" strokeWidth="220" strokeLinecap="round"
         />
       </g>
 
-      {/* ── Mark B: Corner exit oversteer arc, right side ───────────────────── */}
-      {/* Curved rubber from rear stepping out on corner exit                   */}
-      <g filter="url(#rubber)" opacity="0.88">
+      {/* Five-arc groove band */}
+      <g filter="url(#groove)">
+        {/* arc 0 — outer edge */}
         <path
-          d="M 1395,835 C 1310,710 1190,590 1055,498"
+          d="M -200,100 C 350,68 718,158 928,294 C 1138,430 1348,590 1638,696"
+          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.20"
+        />
+        {/* arc 1 */}
+        <path
+          d="M -200,122 C 350,90 718,180 928,316 C 1138,452 1348,612 1638,718"
+          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.36"
+        />
+        {/* arc 2 — racing line (center, darkest) */}
+        <path
+          d="M -200,144 C 350,112 718,202 928,338 C 1138,474 1348,634 1638,740"
+          fill="none" stroke="url(#gA)" strokeWidth="16" strokeLinecap="round"
+          opacity="0.52"
+        />
+        {/* arc 3 */}
+        <path
+          d="M -200,166 C 350,134 718,224 928,360 C 1138,496 1348,656 1638,762"
+          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.36"
+        />
+        {/* arc 4 — inner edge */}
+        <path
+          d="M -200,188 C 350,156 718,246 928,382 C 1138,518 1348,678 1638,784"
+          fill="none" stroke="url(#gA)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.20"
+        />
+      </g>
+
+      {/*
+        ── Corner B: upper-right → lower-left ────────────────────────────────
+        Crosses Corner A to create an S-curve track sequence.
+        Slightly lighter overall — this corner sees less traffic.
+      */}
+
+      {/* Outer haze */}
+      <g filter="url(#haze)" opacity="0.42">
+        <path
+          d="M 1640,110 C 1280,160 980,320 780,470 C 580,620 260,730 -200,810"
+          fill="none" stroke="url(#gB)" strokeWidth="200" strokeLinecap="round"
+        />
+      </g>
+
+      {/* Five-arc groove band */}
+      <g filter="url(#groove)">
+        {/* arc 0 — outer edge */}
+        <path
+          d="M 1640,82 C 1278,134 976,294 776,444 C 576,594 258,704 -200,786"
           fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
-          strokeDasharray="380 6 210 8 180"
+          opacity="0.16"
         />
+        {/* arc 1 */}
         <path
-          d="M 1377,826 C 1292,700 1172,582 1037,490"
-          fill="none" stroke="url(#gB)" strokeWidth="12" strokeLinecap="round"
-          strokeDasharray="340 9 190 7 160"
+          d="M 1640,104 C 1278,156 976,316 776,466 C 576,616 258,726 -200,808"
+          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.28"
         />
-      </g>
-
-      {/* ── Mark C: Tyre warmup / burnout arc, lower centre ─────────────────── */}
-      {/* Wide curved marks from wheelspin coming out of a slow corner          */}
-      <g filter="url(#rubber)" opacity="0.78">
+        {/* arc 2 — racing line */}
         <path
-          d="M 498,882 C 548,820 568,755 532,678"
-          fill="none" stroke="url(#gC)" strokeWidth="15" strokeLinecap="round"
-          strokeDasharray="240 11 130 8 80"
+          d="M 1640,126 C 1278,178 976,338 776,488 C 576,638 258,748 -200,830"
+          fill="none" stroke="url(#gB)" strokeWidth="16" strokeLinecap="round"
+          opacity="0.42"
         />
+        {/* arc 3 */}
         <path
-          d="M 520,877 C 572,814 592,747 556,670"
-          fill="none" stroke="url(#gC)" strokeWidth="13" strokeLinecap="round"
-          strokeDasharray="210 13 110 9 70"
+          d="M 1640,148 C 1278,200 976,360 776,510 C 576,660 258,770 -200,852"
+          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.28"
         />
-        {/* Third inner arc — cars spin out wide */}
+        {/* arc 4 — inner edge */}
         <path
-          d="M 475,886 C 520,826 538,762 500,688"
-          fill="none" stroke="url(#gC)" strokeWidth="9" strokeLinecap="round"
-          strokeDasharray="180 15 90"
-          opacity="0.6"
-        />
-      </g>
-
-      {/* ── Mark D: Long high-speed braking, upper area ──────────────────────── */}
-      {/* Lighter, wider-spaced — car was still fast when brakes applied        */}
-      <g filter="url(#rubber)" opacity="0.8">
-        <path
-          d="M 190,278 C 480,268 760,258 1125,248"
-          fill="none" stroke="url(#gD)" strokeWidth="9" strokeLinecap="round"
-          strokeDasharray="480 6 290 9 200 5 120"
-        />
-        <path
-          d="M 190,294 C 480,284 760,274 1125,264"
-          fill="none" stroke="url(#gD)" strokeWidth="8" strokeLinecap="round"
-          strokeDasharray="430 9 260 7 180 6 100"
-        />
-      </g>
-
-      {/* ── Mark E: Late-apex correction flick, left edge ────────────────────── */}
-      {/* Quick direction change: short curved marks                            */}
-      <g filter="url(#rubber)" opacity="0.82">
-        <path
-          d="M 55,718 C 130,660 240,560 410,448"
-          fill="none" stroke="url(#gE)" strokeWidth="11" strokeLinecap="round"
-          strokeDasharray="300 8 160 6 100"
-        />
-        <path
-          d="M 72,726 C 148,668 258,568 428,456"
-          fill="none" stroke="url(#gE)" strokeWidth="10" strokeLinecap="round"
-          strokeDasharray="260 10 140 8 90"
+          d="M 1640,170 C 1278,222 976,382 776,532 C 576,682 258,792 -200,874"
+          fill="none" stroke="url(#gB)" strokeWidth="14" strokeLinecap="round"
+          opacity="0.16"
         />
       </g>
     </svg>

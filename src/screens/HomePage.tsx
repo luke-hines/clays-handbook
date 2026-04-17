@@ -8,26 +8,50 @@ import LessonCard from '@/components/learner/LessonCard'
 import Icon from '@/components/shared/Icon'
 import PageLoader, { usePageLoader } from '@/components/shared/PageLoader'
 
-// ── Track curbs (fixed, hidden behind hero's solid bg via z-index) ────────────
+// ── Track kerbs (fixed, hidden behind hero's solid bg via z-index) ────────────
+// Square red/white block segments — like real flat kerb tiles on a racing circuit.
 function Curbs() {
-  const bg = `repeating-linear-gradient(
+  const W = 54      // kerb width in px
+  const B = 54      // block height in px — square tiles
+
+  // Base red/white blocks
+  const blocks = `repeating-linear-gradient(
     180deg,
-    #C42820 0px,  #C42820 28px,
-    #EDE8DF 28px, #EDE8DF 56px
+    #C22820 0px,       #C22820 ${B}px,
+    #F0EBE3 ${B}px,    #F0EBE3 ${B * 2}px
   )`
+
+  // Thin dark seam lines at each block boundary
+  const seams = `repeating-linear-gradient(
+    180deg,
+    rgba(0,0,0,0.45) 0px,        rgba(0,0,0,0.45) 2px,
+    transparent 2px,             transparent ${B}px,
+    rgba(0,0,0,0.45) ${B}px,     rgba(0,0,0,0.45) ${B + 2}px,
+    transparent ${B + 2}px,      transparent ${B * 2}px
+  )`
+
   const base: React.CSSProperties = {
     position: 'fixed',
-    top: 58,   // start below nav
+    top: 58,
     bottom: 0,
-    width: 28,
-    zIndex: 4, // hero section uses z-index 5, covering curbs while hero is on screen
+    width: W,
+    zIndex: 4,
     pointerEvents: 'none',
-    background: bg,
+    backgroundImage: `${seams}, ${blocks}`,
   }
+
   return (
     <>
-      <div style={{ ...base, left: 0, boxShadow: 'inset -4px 0 12px rgba(0,0,0,0.55)' }} />
-      <div style={{ ...base, right: 0, boxShadow: 'inset  4px 0 12px rgba(0,0,0,0.55)' }} />
+      {/* Left kerb — inner shadow fades into track */}
+      <div style={{
+        ...base, left: 0,
+        boxShadow: 'inset -6px 0 0 rgba(0,0,0,0.25), inset -14px 0 28px rgba(0,0,0,0.55)',
+      }} />
+      {/* Right kerb */}
+      <div style={{
+        ...base, right: 0,
+        boxShadow: 'inset  6px 0 0 rgba(0,0,0,0.25), inset  14px 0 28px rgba(0,0,0,0.55)',
+      }} />
     </>
   )
 }
